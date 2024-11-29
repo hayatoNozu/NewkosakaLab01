@@ -9,11 +9,13 @@ TagManager:
   - Wall3
   - ghost
   - laser
+  - projectile
+  - FxTemporaire
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Mirror
   - Water
   - UI
   - 

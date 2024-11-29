@@ -12,7 +12,7 @@ public class trigar : MonoBehaviour
 
     void Start()
     {
-        particle.SetActive(false);
+        //particle.SetActive(false);
     }
 
     void Update()
@@ -27,7 +27,7 @@ public class trigar : MonoBehaviour
         else
         {
             laser.SetActive(false);
-            particle.SetActive(false);
+            //particle.SetActive(false);
         }
     }
 
