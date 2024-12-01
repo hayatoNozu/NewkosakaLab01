@@ -5,18 +5,21 @@ using System;
 
 public class LaserReflector : MonoBehaviour
 {
-    public GameObject laserPrefab;  // レーザーのPrefab
-    public Transform laserStartPoint;  // レーザーのスタート位置を指定するTransform
-    public int maxReflections = 5;  // 最大反射回数
-    public float maxLaserDistance = 100f;  // 最大レーザー距離
-    public LayerMask reflectLayerMask;  // 反射可能なレイヤー
-    public Color[] laserColors;  // 反射ごとに使用する色
+    public GameObject laserPrefab;
+    public int maxReflections = 5;
+    public float maxLaserDistance = 100f;
+    public LayerMask reflectLayerMask;
+    public Material[] laserMaterials;
+
+    private List<GameObject> laserSegments = new List<GameObject>();
+
+    // 反射回数を記録する変数
+    public int currentReflections { get; private set; } // 外部から読み取り専用
     private SteamVR_Action_Boolean Iui = SteamVR_Actions.default_InteractUI;
     private Boolean interacrtui;
 
-    private List<GameObject> laserSegments = new List<GameObject>();  // 生成したレーザーオブジェクト
-
     [HideInInspector] public bool empty=false;
+
     void Start()
     {
         QualitySettings.vSyncCount = 0;
@@ -25,8 +28,7 @@ public class LaserReflector : MonoBehaviour
 
     void Update()
     {
-        interacrtui = Iui.GetState(SteamVR_Input_Sources.RightHand);
-        if (interacrtui&&!empty)
+        if (Input.GetButton("Fire1"))
         {
             GenerateLaserPath();
         }
@@ -40,121 +42,107 @@ public class LaserReflector : MonoBehaviour
     {
         ClearLaserSegments();
 
-        // レーザーの開始位置を取得
-        Vector3 startPosition = laserStartPoint != null ? laserStartPoint.position : transform.position;
+        Vector3 startPosition = transform.position;
         Vector3 direction = transform.forward;
-        int reflections = 0;
-        Color currentColor = laserColors[0];  // 最初のレーザーの色（デフォルト）
+        currentReflections = 0; // 反射回数をリセット
+        Material currentMaterial = laserMaterials[0];
 
-        while (reflections < maxReflections)
+        while (currentReflections < maxReflections)
         {
             RaycastHit hit;
             if (Physics.Raycast(startPosition, direction, out hit, maxLaserDistance, reflectLayerMask))
             {
-                // レーザーセグメントを生成
                 List<Vector3> positions = new List<Vector3> { startPosition, hit.point };
-                CreateLaserSegment(startPosition, hit.point, reflections, currentColor, positions);
+                CreateLaserSegment(startPosition, hit.point, currentReflections, currentMaterial, positions);
 
-                // コライダーに応じて色を変更
-                currentColor = ChooseColorBasedOnCollider(hit.collider, currentColor);
+                currentMaterial = ChooseMaterialBasedOnCollider(hit.collider, currentMaterial);
 
-                // 反射処理
                 direction = Vector3.Reflect(direction, hit.normal);
                 startPosition = hit.point;
 
-                reflections++;
+                currentReflections++; // 反射回数を増加
             }
             else
             {
-                // 何にも当たらなかった場合
                 List<Vector3> positions = new List<Vector3> { startPosition, startPosition + direction * maxLaserDistance };
-                CreateLaserSegment(startPosition, startPosition + direction * maxLaserDistance, reflections, currentColor, positions);
+                CreateLaserSegment(startPosition, startPosition + direction * maxLaserDistance, currentReflections, currentMaterial, positions);
                 break;
             }
         }
     }
 
-    void CreateLaserSegment(Vector3 start, Vector3 end, int reflectionIndex, Color currentColor, List<Vector3> posList)
+    void CreateLaserSegment(Vector3 start, Vector3 end, int reflectionIndex, Material currentMaterial, List<Vector3> posList)
     {
-        GameObject laser = Instantiate(laserPrefab, Vector3.zero, Quaternion.identity);
-        laser.tag = "laser";  // タグ設定
+        GameObject laser = Instantiate(laserPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        laser.tag = "laser";
+        laser.layer = LayerMask.NameToLayer("laserLayer");
 
-        // LineRendererを取得
         LineRenderer line = laser.GetComponent<LineRenderer>();
         line.positionCount = posList.Count;
 
-        // LineRendererに座標を設定
         for (int iLoop = 0; iLoop < posList.Count; iLoop++)
         {
             line.SetPosition(iLoop, posList[iLoop]);
         }
 
-        // BoxColliderを追加して調整
         BoxCollider boxCollider = laser.AddComponent<BoxCollider>();
+        boxCollider.isTrigger = true;
 
-        // レーザーの方向ベクトルを計算
         Vector3 direction = end - start;
-        float length = direction.magnitude; // レーザーの長さ
+        float length = direction.magnitude;
 
-        // レーザーの回転を設定
         laser.transform.position = start;
         laser.transform.LookAt(end);
 
-        // コライダーの中心を設定 (ローカル空間での中心)
         boxCollider.center = new Vector3(0, 0, length / 2.0f);
-
-        // コライダーのサイズを設定 (長さに沿ったスケール)
         boxCollider.size = new Vector3(0.1f, 0.1f, length);
 
-        // LineRendererの設定
-        line.startColor = currentColor;
-        line.endColor = currentColor;
         line.SetPosition(0, start);
         line.SetPosition(1, end);
+        line.material = currentMaterial;
 
-        // 作成したレーザーをリストに追加
         laserSegments.Add(laser);
     }
 
-    Color ChooseColorBasedOnCollider(Collider collider, Color currentColor)
+    Material ChooseMaterialBasedOnCollider(Collider collider, Material currentMaterial)
     {
-        if (collider.CompareTag("Wall"))
+        if (collider.CompareTag("blue"))
         {
-            if (currentColor == laserColors[2])
+            if (currentMaterial == laserMaterials[2])
             {
-                return laserColors[4];  // シアン
+                return laserMaterials[4];
             }
-            else if (currentColor == laserColors[3])
+            else if (currentMaterial == laserMaterials[3])
             {
-                return laserColors[5];  // マゼンタ
+                return laserMaterials[5];
             }
-            return laserColors[1]; // 青
+            return laserMaterials[1];
         }
-        else if (collider.CompareTag("Wall2"))
+        else if (collider.CompareTag("green"))
         {
-            if (currentColor == laserColors[1])
+            if (currentMaterial == laserMaterials[1])
             {
-                return laserColors[4];  // シアン
+                return laserMaterials[4];
             }
-            else if (currentColor == laserColors[3])
+            else if (currentMaterial == laserMaterials[3])
             {
-                return laserColors[6];  // イエロー
+                return laserMaterials[6];
             }
-            return laserColors[2]; // 緑
+            return laserMaterials[2];
         }
-        else if (collider.CompareTag("Wall3"))
+        else if (collider.CompareTag("red"))
         {
-            if (currentColor == laserColors[2])
+            if (currentMaterial == laserMaterials[2])
             {
-                return laserColors[6];  // イエロー
+                return laserMaterials[6];
             }
-            else if (currentColor == laserColors[1])
+            else if (currentMaterial == laserMaterials[1])
             {
-                return laserColors[5];  // マゼンタ
+                return laserMaterials[5];
             }
-            return laserColors[3]; // 赤
+            return laserMaterials[3];
         }
-        return currentColor;
+        return currentMaterial;
     }
 
     void ClearLaserSegments()
