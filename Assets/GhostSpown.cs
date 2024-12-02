@@ -41,6 +41,7 @@ public class GhostSpown : MonoBehaviour
                     if (IsPositionValid(randomPosition))
                     {
                         GameObject spawnedObject = Instantiate(objectToSpawn, randomPosition, Quaternion.identity);
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.white);
 
                         if (player != null)
                         {
