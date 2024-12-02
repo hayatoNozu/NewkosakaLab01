@@ -68,6 +68,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: mirror_circlePrefabPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 3249671839424917672, guid: 23f87dbd3b799d542ac36d15b3d6e7a4, type: 3}
+      propertyPath: m_Name
+      value: mirror
+      objectReference: {fileID: 0}
     - target: {fileID: 8339572965373867600, guid: 23f87dbd3b799d542ac36d15b3d6e7a4, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
