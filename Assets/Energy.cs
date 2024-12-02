@@ -15,6 +15,7 @@ public class Energy : MonoBehaviour
     public GameObject handle;
     private float cumulativeAngle = 0f; // 累積回転角度
     private float lastAngle = 0f; // 前回フレームのハンドル角度
+    private bool triger;
 
     void Start()
     {
@@ -62,6 +63,11 @@ public class Energy : MonoBehaviour
         if (interactUI)
         {
             energy -= 0.1f;
+            triger = true;
+        }
+        else
+        {
+            triger = false;
         }
 
         // ハンドルの角度を取得
@@ -75,7 +81,12 @@ public class Energy : MonoBehaviour
         // 累積角度が 360 度を超えた場合にエネルギーを回復
         if (Mathf.Abs(cumulativeAngle) >= 360f)
         {
-            energy += 10;
+            if (!triger)
+            {
+                energy += 10;
+            }
+
+            
             cumulativeAngle = 0f; // 累積角度をリセット
         }
 

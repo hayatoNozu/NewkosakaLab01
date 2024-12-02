@@ -595,7 +595,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectToSpawn: {fileID: 2081847934699004006, guid: 82e8bb5e90316ac4da2993bd8e0ea41c, type: 3}
-  player: {fileID: 646850701}
+  player: {fileID: 1312377570}
   spawnAreaMin: {x: 6, y: 4, z: -26}
   spawnAreaMax: {x: 16, y: 4, z: -12}
   spawnInterval: 5
@@ -1940,11 +1940,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 57977128963d01f4eb6e63e0a95783bd, type: 3}
---- !u!1 &646850701 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2918977552711085725, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-  m_PrefabInstance: {fileID: 294243507}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &707004409
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2485,6 +2480,11 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!1 &1312377570 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1421529838129172647, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
+  m_PrefabInstance: {fileID: 294243507}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1315533311
 PrefabInstance:
   m_ObjectHideFlags: 0
