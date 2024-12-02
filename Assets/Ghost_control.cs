@@ -64,7 +64,7 @@ public class Ghost_control : MonoBehaviour
 
     private IEnumerator Atack()
     {
-        while (ATtime < 10)
+        while (ATtime < 15)
         {
             ATtime += 1;
             yield return new WaitForSeconds(1f); // 1秒ごとに増加

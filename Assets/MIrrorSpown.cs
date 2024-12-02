@@ -1,70 +1,106 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class MirrorSpawner : MonoBehaviour
+public class RandomSpawner : MonoBehaviour
 {
-    public GameObject mirrorPrefab; // 鏡のPrefab
-    public Transform[] wallAreas;  // 壁エリア（4つの壁のエリアを指定）
-    public int mirrorCount = 10;   // 生成する鏡の数
-    public float minDistance = 2f; // 鏡同士の最小距離
+    // スポーンするオブジェクトのプレハブを2種類設定
+    public GameObject[] objectPrefabs;
 
-    private List<Vector3> mirrorPositions = new List<Vector3>(); // 鏡の位置を記録
+    // スポーン候補の位置（4か所）
+    public Transform[] spawnPoints;
 
-    void Start()
+    // オブジェクトの最小距離
+    public float minDistance = 2f;
+
+    // 現在の生成済みオブジェクトの位置リスト
+    private List<Vector3> spawnedPositions = new List<Vector3>();
+
+    // スポーンを行うメソッド
+    public void SpawnObject(Color mirrorColor)
     {
-        SpawnMirrors();
-    }
-
-    void SpawnMirrors()
-    {
-        int mirrorsSpawned = 0;
-
-        while (mirrorsSpawned < mirrorCount)
+        if (spawnPoints.Length == 0 || objectPrefabs.Length == 0)
         {
-            // ランダムな壁エリアを選択
-            Transform selectedArea = wallAreas[Random.Range(0, wallAreas.Length)];
+            Debug.LogError("Spawn points or object prefabs are not set!");
+            return;
+        }
 
-            // エリア内のランダムな位置を計算
-            Vector3 randomPosition = GetRandomPositionInArea(selectedArea);
+        // ランダムにスポーン位置を選ぶ
+        int randomPointIndex = Random.Range(0, spawnPoints.Length);
+        Transform chosenPoint = spawnPoints[randomPointIndex];
 
-            // 鏡同士の距離をチェック
-            if (IsPositionValid(randomPosition))
+        // ローカル座標でのZ軸オフセットを決定し、重複を回避
+        Vector3 localOffset;
+        Vector3 spawnPosition;
+        int attempts = 0; // 無限ループ防止用
+        const int maxAttempts = 100;
+
+        do
+        {
+            localOffset = new Vector3(0, 0, Random.Range(-6f, 6f));
+            spawnPosition = chosenPoint.TransformPoint(localOffset); // ローカル座標をワールド座標に変換
+            attempts++;
+        }
+        while (!IsPositionValid(spawnPosition) && attempts < maxAttempts);
+
+        // 最大試行回数を超えた場合
+        if (attempts >= maxAttempts)
+        {
+            Debug.LogWarning("Failed to find a valid position for spawning. Skipping spawn.");
+            return;
+        }
+
+        // ランダムにオブジェクトを選択
+        int randomPrefabIndex = Random.Range(0, objectPrefabs.Length);
+        GameObject chosenPrefab = objectPrefabs[randomPrefabIndex];
+
+        // オブジェクトをインスタンス化
+        GameObject spawnedObject = Instantiate(chosenPrefab, chosenPoint);
+        spawnedObject.transform.localPosition = localOffset;
+
+        Transform targetChild = spawnedObject.transform.Find("mirror");
+
+        if (targetChild != null)
+        {
+            // 子オブジェクトが見つかった場合、そのRendererを取得してマテリアルを変更
+            Renderer childRenderer = targetChild.GetComponent<Renderer>();
+            if (childRenderer != null)
             {
-                // 鏡を生成
-                Instantiate(mirrorPrefab, randomPosition, Quaternion.identity);
-
-                // 鏡の位置をリストに追加
-                mirrorPositions.Add(randomPosition);
-
-                mirrorsSpawned++;
+                childRenderer.material.color = mirrorColor; // 新しい色を適用
+            }
+            else
+            {
+                Debug.LogWarning("Renderer not found on target child!");
             }
         }
-    }
-
-    Vector3 GetRandomPositionInArea(Transform area)
-    {
-        // エリアのサイズを取得
-        Vector3 areaSize = area.localScale;
-        Vector3 areaCenter = area.position;
-
-        // エリア内のランダムな位置を計算
-        float randomX = Random.Range(-areaSize.x / 2, areaSize.x / 2);
-        float randomY = Random.Range(-areaSize.y / 2, areaSize.y / 2);
-        float randomZ = Random.Range(-areaSize.z / 2, areaSize.z / 2);
-
-        return areaCenter + new Vector3(randomX, randomY, randomZ);
-    }
-
-    bool IsPositionValid(Vector3 position)
-    {
-        foreach (Vector3 existingPosition in mirrorPositions)
+        else
         {
-            // 既存の鏡との距離をチェック
-            if (Vector3.Distance(position, existingPosition) < minDistance)
+            Debug.LogWarning($"Child with name mirror not found!");
+        }
+
+        // 新しいオブジェクトの位置をリストに追加
+        spawnedPositions.Add(spawnPosition);
+    }
+
+
+    // 指定された位置が他のオブジェクトと十分離れているか確認
+    private bool IsPositionValid(Vector3 position)
+    {
+        foreach (Vector3 spawnedPosition in spawnedPositions)
+        {
+            if (Vector3.Distance(position, spawnedPosition) < minDistance)
             {
                 return false;
             }
         }
         return true;
+    }
+
+    // デバッグ用にキーでスポーンをトリガー
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space)) // スペースキーでスポーン
+        {
+            SpawnObject(Color.white);
+        }
     }
 }
