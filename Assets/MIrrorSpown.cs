@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RandomSpawner : MonoBehaviour
+public class MirrorSpown : MonoBehaviour
 {
     // スポーンするオブジェクトのプレハブを2種類設定
     public GameObject[] objectPrefabs;
@@ -17,7 +17,7 @@ public class RandomSpawner : MonoBehaviour
 
     // スポーンを行うメソッド
     public void SpawnObject(Color mirrorColor)
-    {
+    {                         
         if (spawnPoints.Length == 0 || objectPrefabs.Length == 0)
         {
             Debug.LogError("Spawn points or object prefabs are not set!");
@@ -56,9 +56,10 @@ public class RandomSpawner : MonoBehaviour
         // オブジェクトをインスタンス化
         GameObject spawnedObject = Instantiate(chosenPrefab, chosenPoint);
         spawnedObject.transform.localPosition = localOffset;
-
         Transform targetChild = spawnedObject.transform.Find("mirror");
 
+
+          
         if (targetChild != null)
         {
             // 子オブジェクトが見つかった場合、そのRendererを取得してマテリアルを変更
@@ -66,11 +67,18 @@ public class RandomSpawner : MonoBehaviour
             if (childRenderer != null)
             {
                 childRenderer.material.color = mirrorColor; // 新しい色を適用
+
             }
             else
             {
                 Debug.LogWarning("Renderer not found on target child!");
             }
+            
+            //鏡のタグを変更
+            string colorTag = GetColorTag(mirrorColor);
+            spawnedObject.tag = colorTag; // タグを設定
+            ApplyTagToChildren(spawnedObject.transform, colorTag); // 子オブジェクトにもタグを適用
+
         }
         else
         {
@@ -79,6 +87,28 @@ public class RandomSpawner : MonoBehaviour
 
         // 新しいオブジェクトの位置をリストに追加
         spawnedPositions.Add(spawnPosition);
+    }
+
+    private string GetColorTag(Color color)
+    { 
+        if (color == Color.red) return "red";
+        if (color == Color.blue) return "blue";
+        if (color == Color.green) return "green";
+        if (color == Color.white) return "white";
+
+        // 必要に応じて他の色を追加
+        // if (color == Color.yellow) return "yellow";
+
+        return null; // マッチしない場合
+    }
+
+    private void ApplyTagToChildren(Transform parent, string tag)
+    {
+        foreach (Transform child in parent)
+        {
+            child.tag = tag; // 子オブジェクトにタグを設定
+            ApplyTagToChildren(child, tag); // 子孫オブジェクトも対象
+        }
     }
 
 
@@ -95,12 +125,14 @@ public class RandomSpawner : MonoBehaviour
         return true;
     }
 
+    private float timer = 10;
     // デバッグ用にキーでスポーンをトリガー
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) // スペースキーでスポーン
         {
-            SpawnObject(Color.white);
+            SpawnObject(Color.red);
         }
+
     }
 }

@@ -9,7 +9,7 @@ public class LaserReflector : MonoBehaviour
     public int maxReflections = 5;
     public float maxLaserDistance = 100f;
     public LayerMask reflectLayerMask;
-    public Material[] laserMaterials;
+    public Color[] laserColors;
 
     private List<GameObject> laserSegments = new List<GameObject>();
 
@@ -18,22 +18,37 @@ public class LaserReflector : MonoBehaviour
     private SteamVR_Action_Boolean Iui = SteamVR_Actions.default_InteractUI;
     private Boolean interacrtui;
 
+    AudioSource audio;
+    private bool se =true;
+
     [HideInInspector] public bool empty=false;
 
     void Start()
     {
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
+        audio = GetComponent<AudioSource>();
     }
 
     void Update()
     {
-        if (Input.GetButton("Fire1"))
+        interacrtui = Iui.GetState(SteamVR_Input_Sources.RightHand);
+        if (interacrtui && !empty)
         {
             GenerateLaserPath();
+
+            //bgm razer
+            if (se)
+            {
+                PlayMusic();
+                se = false; 
+            }
+            
         }
         else
         {
+            StopMusic();
+            se =true;
             ClearLaserSegments();
         }
     }
@@ -45,7 +60,7 @@ public class LaserReflector : MonoBehaviour
         Vector3 startPosition = transform.position;
         Vector3 direction = transform.forward;
         currentReflections = 0; // 反射回数をリセット
-        Material currentMaterial = laserMaterials[0];
+        Color currentColor = laserColors[0];
 
         while (currentReflections < maxReflections)
         {
@@ -53,9 +68,9 @@ public class LaserReflector : MonoBehaviour
             if (Physics.Raycast(startPosition, direction, out hit, maxLaserDistance, reflectLayerMask))
             {
                 List<Vector3> positions = new List<Vector3> { startPosition, hit.point };
-                CreateLaserSegment(startPosition, hit.point, currentReflections, currentMaterial, positions);
+                CreateLaserSegment(startPosition, hit.point, currentReflections, currentColor, positions);
 
-                currentMaterial = ChooseMaterialBasedOnCollider(hit.collider, currentMaterial);
+                currentColor = ChooseColorBasedOnCollider(hit.collider, currentColor);
 
                 direction = Vector3.Reflect(direction, hit.normal);
                 startPosition = hit.point;
@@ -65,13 +80,27 @@ public class LaserReflector : MonoBehaviour
             else
             {
                 List<Vector3> positions = new List<Vector3> { startPosition, startPosition + direction * maxLaserDistance };
-                CreateLaserSegment(startPosition, startPosition + direction * maxLaserDistance, currentReflections, currentMaterial, positions);
+                CreateLaserSegment(startPosition, startPosition + direction * maxLaserDistance, currentReflections, currentColor, positions);
                 break;
             }
         }
+
     }
 
-    void CreateLaserSegment(Vector3 start, Vector3 end, int reflectionIndex, Material currentMaterial, List<Vector3> posList)
+    void PlayMusic()
+    {
+        if(audio != null)
+        {
+            audio.Play();
+        }
+    }
+
+    void StopMusic()
+    {
+        audio.Stop();
+    }
+
+    void CreateLaserSegment(Vector3 start, Vector3 end, int reflectionIndex, Color currentColor, List<Vector3> posList)
     {
         GameObject laser = Instantiate(laserPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         laser.tag = "laser";
@@ -97,52 +126,53 @@ public class LaserReflector : MonoBehaviour
         boxCollider.center = new Vector3(0, 0, length / 2.0f);
         boxCollider.size = new Vector3(0.1f, 0.1f, length);
 
+        line.startColor = currentColor;
+        line.endColor = currentColor;
         line.SetPosition(0, start);
         line.SetPosition(1, end);
-        line.material = currentMaterial;
 
         laserSegments.Add(laser);
     }
 
-    Material ChooseMaterialBasedOnCollider(Collider collider, Material currentMaterial)
+    Color ChooseColorBasedOnCollider(Collider collider, Color currentColor)
     {
         if (collider.CompareTag("blue"))
         {
-            if (currentMaterial == laserMaterials[2])
+            if (currentColor == laserColors[2])
             {
-                return laserMaterials[4];
+                return laserColors[4];  // シアン
             }
-            else if (currentMaterial == laserMaterials[3])
+            else if (currentColor == laserColors[3])
             {
-                return laserMaterials[5];
+                return laserColors[5];  // マゼンタ
             }
-            return laserMaterials[1];
+            return laserColors[1]; // 青
         }
         else if (collider.CompareTag("green"))
         {
-            if (currentMaterial == laserMaterials[1])
+            if (currentColor == laserColors[1])
             {
-                return laserMaterials[4];
+                return laserColors[4];  // シアン
             }
-            else if (currentMaterial == laserMaterials[3])
+            else if (currentColor == laserColors[3])
             {
-                return laserMaterials[6];
+                return laserColors[6];  // イエロー
             }
-            return laserMaterials[2];
+            return laserColors[2]; // 緑
         }
         else if (collider.CompareTag("red"))
         {
-            if (currentMaterial == laserMaterials[2])
+            if (currentColor == laserColors[2])
             {
-                return laserMaterials[6];
+                return laserColors[6];  // イエロー
             }
-            else if (currentMaterial == laserMaterials[1])
+            else if (currentColor == laserColors[1])
             {
-                return laserMaterials[5];
+                return laserColors[5];  // マゼンタ
             }
-            return laserMaterials[3];
+            return laserColors[3]; // 赤
         }
-        return currentMaterial;
+        return currentColor;
     }
 
     void ClearLaserSegments()
