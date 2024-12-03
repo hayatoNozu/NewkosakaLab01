@@ -24,6 +24,8 @@ public class Ghost_control : MonoBehaviour
         minScale = 0.3f;
         maxScale = 0.4f;
         StartCoroutine(Atack()); // コルーチンを一度だけ実行
+        string name = gameObject.name;
+        AG += 1;
     }
 
     void Update()
@@ -33,26 +35,77 @@ public class Ghost_control : MonoBehaviour
 
         if(HP <=  0)
         {
+            if(name == whiteGhost)
+            {
+                whgD +=1;
+            }
+            else if(name == redGhost)
+            {
+                regD +=1;
+            }
+            else if(name == blueGhost)
+            {
+                blgD += 1;
+            }
+            else if(name == greenGhost)
+            {
+                grgD += 1;
+            }
+            else if(name == cyanGhost)
+            {
+                cygD += 1;
+            }
+            else if(name == magentaGhost)
+            {
+                magD += 1;
+            }
+            else if(name == yellowGhost)
+            {
+                yegD += 1;
+            }
+            DG += 1;
             Destroy(this.gameObject);
         }
 
         float newScale = Mathf.Lerp(minScale, maxScale, HP / maxHP);
         transform.localScale = new Vector3(newScale, newScale, newScale);
     }
+    //whiteGhost,redGhost,blueGhost,greenGhost,cyanGhot,magentaGhost,yelllowGhost
 
     private void OnTriggerEnter(Collider other)
+{
+    if (other.gameObject.CompareTag("laser"))
     {
-        if (other.gameObject.CompareTag("laser")) 
+        // ラインレンダラーの色を取得
+        LineRenderer lineRenderer = other.GetComponent<LineRenderer>();
+        if (lineRenderer != null)
         {
-            HP -= 1f;
-            this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
+            Color lineColor = lineRenderer.startColor; // 必要に応じてendColorも使用
+
+            // 自分のマテリアルの色を取得
+            Renderer renderer = GetComponent<Renderer>();
+            if (renderer != null && renderer.material != null)
+            {
+                Color myColor = renderer.material.color;
+
+                // 色の一致判定（近似比較）
+                if (AreColorsSimilar(myColor, lineColor, 0.01f)) // 誤差は0.01f（適宜調整）
+                {
+                    Debug.Log("マテリアルの色とラインレンダラーの色が一致しました！");
+                    HP -= 1f;
+                    this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
+    
+                }
+                else
+                {
+                    Debug.Log("色が一致しません。");
+                }
+            }
         }
-
-
     }
+}
+/*
 
-
-    /*
     private IEnumerator wait()
     {
         if (isHit)
@@ -92,7 +145,18 @@ public class Ghost_control : MonoBehaviour
             ATtime += 1;
             yield return new WaitForSeconds(1f); // 1秒ごとに増加
         }
+        if(name != whiteGhost)
+        {
+            //攻撃された時の処理
+        }
 
         gameObject.SetActive(false);
+    }
+
+    private bool AreColorsSimilar(Color color1, Color color2, float tolerance)
+    {
+        return Mathf.Abs(color1.r - color2.r) < tolerance &&
+            Mathf.Abs(color1.g - color2.g) < tolerance &&
+            Mathf.Abs(color1.b - color2.b) < tolerance;
     }
 }
