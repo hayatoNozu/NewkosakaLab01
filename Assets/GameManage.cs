@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManage : MonoBehaviour
 {
 
     public static int whg = 0;
@@ -20,7 +20,10 @@ public class GameManager : MonoBehaviour
     public static float rate = 0;
     public static int AG = 0;
     public static int DG = 0;
-
+    public static int damage = 0;
+    
+    public GameObject[] objectsToHide; // 非表示にするオブジェクトのリスト
+    private int currentIndex = 0;      // 次に非表示にするオブジェクトのインデックス
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -31,7 +34,19 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // ダメージによるオブジェクト非表示処理
+        if (damage > currentIndex && currentIndex < objectsToHide.Length)
+        {
+            // 現在のインデックスに対応するオブジェクトを非表示にする
+            objectsToHide[currentIndex].SetActive(false);
+            currentIndex++;
+        }
+
+        // すべてのオブジェクトが非表示になった場合のゲームオーバー判定
+        if (currentIndex >= objectsToHide.Length)
+        {
+            //ゲームオーバーの処理
+        }
     }
     public void GameEnd()
     {

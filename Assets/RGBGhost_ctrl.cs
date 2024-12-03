@@ -35,7 +35,7 @@ public class RGBGhost_ctrl : MonoBehaviour
 
         if(HP <=  0)
         {
-            if(name == whiteGhost)
+            /*if(name == whiteGhost)
             {
                 
             }
@@ -62,7 +62,7 @@ public class RGBGhost_ctrl : MonoBehaviour
             else if(name == yellowGhost)
             {
                 
-            }
+            }*/
 
             Destroy(this.gameObject);
         }

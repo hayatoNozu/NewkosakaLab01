@@ -18,6 +18,7 @@ public class Ghost_control : MonoBehaviour
 
     void Start()
     {
+
         HP = 100;
         ATtime = 0;
         maxHP = 100;
@@ -25,7 +26,7 @@ public class Ghost_control : MonoBehaviour
         maxScale = 0.4f;
         StartCoroutine(Atack()); // コルーチンを一度だけ実行
         string name = gameObject.name;
-        AG += 1;
+        GameManage.AG += 1;
     }
 
     void Update()
@@ -37,33 +38,33 @@ public class Ghost_control : MonoBehaviour
         {
             if(name == whiteGhost)
             {
-                whgD +=1;
+                GameManage.whgD +=1;
             }
             else if(name == redGhost)
             {
-                regD +=1;
+                GameManage.regD +=1;
             }
             else if(name == blueGhost)
             {
-                blgD += 1;
+                GameManage.blgD += 1;
             }
             else if(name == greenGhost)
             {
-                grgD += 1;
+                GameManage.grgD += 1;
             }
             else if(name == cyanGhost)
             {
-                cygD += 1;
+                GameManage.cygD += 1;
             }
             else if(name == magentaGhost)
             {
-                magD += 1;
+                GameManage.magD += 1;
             }
             else if(name == yellowGhost)
             {
-                yegD += 1;
+                GameManage.yegD += 1;
             }
-            DG += 1;
+            GameManage.DG += 1;
             Destroy(this.gameObject);
         }
 
@@ -148,6 +149,7 @@ public class Ghost_control : MonoBehaviour
         if(name != whiteGhost)
         {
             //攻撃された時の処理
+            GameManage.damage += 1;
         }
 
         gameObject.SetActive(false);
