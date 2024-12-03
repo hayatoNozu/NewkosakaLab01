@@ -1,12 +1,13 @@
 using UnityEngine;
-using System.Collections; // コルーチン用
-using UnityEngine.UI;
+using System.Collections;
 
 public class SequentialUI : MonoBehaviour
 {
-    public GameObject[] ghostNormal; // UI要素を格納する配列
-    public GameObject[] ghostParfect;
+    public GameObject[] ghostNormal; // 通常UI要素
+    public GameObject[] ghostParfect; // 完璧UI要素
+    public GameObject lastUI; // 最後に表示するUI
     public float displayInterval = 0.5f; // 表示間隔
+    public float lastDisplayDelay = 1f; // 最後のUIを表示するまでの遅延
 
     void Start()
     {
@@ -21,14 +22,23 @@ public class SequentialUI : MonoBehaviour
 
     IEnumerator DisplayUIElements()
     {
+        // 配列内のUI要素を順に表示
         for (int i = 0; i < ghostParfect.Length; i++)
         {
             if (ghostParfect[i] != null)
             {
-                ghostParfect[i].SetActive(true); // UIを表示
-                ghostNormal[i].SetActive(false);
-                yield return new WaitForSeconds(displayInterval); 
+                ghostParfect[i].SetActive(true); // 完璧UIを表示
+                ghostNormal[i]?.SetActive(false); // 通常UIを非表示
+                yield return new WaitForSeconds(displayInterval);
             }
+        }
+
+        // 最後のUIを1秒後に表示
+        yield return new WaitForSeconds(lastDisplayDelay);
+
+        if (lastUI != null)
+        {
+            lastUI.SetActive(true);
         }
     }
 }

@@ -12,8 +12,9 @@ public class GhostSpawn : MonoBehaviour
     [SerializeField] private float minDistanceFromPlayer = 3f;     // プレイヤーとの最小距離
 
     private List<GameObject> spawnedObjects = new List<GameObject>(); // スポーン済みのオブジェクトを記録
+    private List<int> spawnSteps = new List<int> { 3, 3, 3, 1, 3, 3, 1, 3, 3, 2 }; // スポーン順
+    private int spawnIndex = 0; // 現在のステップのインデックス
     private float time;
-    private int spawnStep = 0; // スポーンのステップ管理用
     private int randam;
 
     void Start()
@@ -50,9 +51,6 @@ public class GhostSpawn : MonoBehaviour
                         directionToPlayer.y = 0; // 水平方向のみを見る場合、Y軸の影響を無視
                         spawnedObject.transform.rotation = Quaternion.LookRotation(directionToPlayer);
                     }
-
-                    // スポーンステップを進める
-                    spawnStep = (spawnStep + 1) % 3;
                     time = 0;
                     return;
                 }
@@ -84,18 +82,19 @@ public class GhostSpawn : MonoBehaviour
 
     private GameObject SelectObjectToSpawn()
     {
-        switch (spawnStep)
+        // 現在のスポーンステップを取得
+        int currentStep = spawnSteps[spawnIndex];
+
+        GameObject selectedObject;
+        switch (currentStep)
         {
-            case 0: // 配列の1番目をスポーン
-                this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.white);
-                return objectToSpawn[0];
             case 1: // 配列の2～4からランダムでスポーン
                 randam = (int)Random.Range(1, 4);
-                if(randam == 1)
+                if (randam == 1)
                 {
                     this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.red);
                 }
-                else if(randam == 2)
+                else if (randam == 2)
                 {
                     this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.green);
                 }
@@ -103,7 +102,8 @@ public class GhostSpawn : MonoBehaviour
                 {
                     this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.blue);
                 }
-                return objectToSpawn[randam];
+                selectedObject = objectToSpawn[randam];
+                break;
             case 2: // 配列の5～7からランダムでスポーン
                 randam = (int)Random.Range(4, 7);
                 if (randam == 4)
@@ -121,10 +121,21 @@ public class GhostSpawn : MonoBehaviour
                     this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.red);
                     this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.green);
                 }
-                return objectToSpawn[randam];
+                selectedObject = objectToSpawn[randam];
+                break;
+            case 3: // 配列の1番目をスポーン
+                this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.white);
+                selectedObject = objectToSpawn[0];
+                break;
             default:
-                return objectToSpawn[0];
+                selectedObject = objectToSpawn[0];
+                break;
         }
+
+        // スポーンインデックスを更新
+        spawnIndex = (spawnIndex + 1) % spawnSteps.Count;
+
+        return selectedObject;
     }
 
 
