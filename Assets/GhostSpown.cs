@@ -11,7 +11,7 @@ public class GhostSpawn : MonoBehaviour
     [SerializeField] private float minDistanceBetweenObjects = 2f; // オブジェクト間の最小距離
     [SerializeField] private float minDistanceFromPlayer = 3f;     // プレイヤーとの最小距離
 
-    private List<GameObject> spawnedObjects = new List<GameObject>(); // スポーン済みのオブジェクトを記録
+    public List<GameObject> spawnedObjects = new List<GameObject>(); // スポーン済みのオブジェクトを記録
     private List<int> spawnSteps = new List<int> { 3, 3, 3, 1, 3, 3, 1, 3, 3, 2 }; // スポーン順
     private int spawnIndex = 0; // 現在のステップのインデックス
     private float time;

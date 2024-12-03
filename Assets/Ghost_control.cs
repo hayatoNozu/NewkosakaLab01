@@ -4,6 +4,19 @@ using TMPro;
 
 public class Ghost_control : MonoBehaviour
 {
+    public enum GhostType
+    {
+        White,
+        Red,
+        Blue,
+        Green,
+        Cyan,
+        Magenta,
+        Yellow
+    }
+
+    public GhostType ghostType; // ゴーストの種類をインスペクターで設定可能にする
+
     private Vector3 originalScale;
     private bool isHit = false;
     private Coroutine shrinkCoroutine;
@@ -18,6 +31,7 @@ public class Ghost_control : MonoBehaviour
     private Renderer ghostRenderer; // ゴーストのレンダラー
     private Renderer childRenderer; // 子オブジェクトのレンダラー
 
+
     // GameManage のインスタンスを参照
     public GameManage gameManage;
 
@@ -29,29 +43,10 @@ public class Ghost_control : MonoBehaviour
         minScale = 0.3f;
         maxScale = 0.4f;
 
-        ghostRenderer = GetComponent<Renderer>();
-        if (ghostRenderer == null || ghostRenderer.material == null)
-        {
-            Debug.LogError("Renderer または Material が見つかりません！");
-        }
-
-        // 子オブジェクト"球.003"のRendererを取得
-        Transform child = transform.Find("球.003");
-        if (child != null)
-        {
-            childRenderer = child.GetComponent<Renderer>();
-            if (childRenderer == null)
-            {
-                Debug.LogError("子オブジェクトのRendererが見つかりません！");
-            }
-        }
-        else
-        {
-            Debug.LogError("子オブジェクト '球.003' が見つかりません！");
-        }
-
+        gameManage = GameObject.Find("GameMnager").GetComponent<GameManage>();
         StartCoroutine(Atack());
         gameManage.AG += 1; // ゲームマネージャーの総ゴースト数を増加
+        
     }
 
     void Update()
@@ -71,25 +66,25 @@ public class Ghost_control : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("laser") || other.gameObject.CompareTag("Rlaser") || other.gameObject.CompareTag("Blaser") || other.gameObject.CompareTag("Glaser") || other.gameObject.CompareTag("Claser") || other.gameObject.CompareTag("Mlaser") || other.gameObject.CompareTag("Ylaser"))
+        string laserTag = other.gameObject.tag;
+        if (laserTag != "laser") return;
+        // オブジェクトの種類と対応するレーザーのタグが一致する場合にダメージを受ける
+        if (laserTag == "laser" ||
+            (ghostType == GhostType.Red && laserTag == "Rlaser") ||
+            (ghostType == GhostType.Blue && laserTag == "Blaser") ||
+            (ghostType == GhostType.Green && laserTag == "Glaser") ||
+            (ghostType == GhostType.Cyan && laserTag == "Claser") ||
+            (ghostType == GhostType.Magenta && laserTag == "Mlaser") ||
+            (ghostType == GhostType.Yellow && laserTag == "Ylaser") ||
+            ghostType == GhostType.White) // Whiteはすべてのレーザーでダメージを受ける
         {
-            // オブジェクト名とレーザーのタグが一致する場合にダメージを受ける
-           if((name == "ghostRedPre" && other.gameObject.CompareTag("Rlaser")) ||
-            (name == "ghostBluePre" && other.gameObject.CompareTag("Blaser")) ||
-            (name == "ghostGreenPre" && other.gameObject.CompareTag("Glaser")) ||
-            (name == "ghostCianPre" && other.gameObject.CompareTag("Claser")) ||
-            (name == "ghostMagentaPre" && other.gameObject.CompareTag("Mlaser")) ||
-            (name == "ghostYellowPre" && other.gameObject.CompareTag("Ylaser")) ||
-            (name == "ghostWhitePre")) // whiteGhostはどのレーザーでもダメージを受ける
-            {
-                Debug.Log($"{name}: {other.gameObject.tag} タグでダメージを受けました！");
-                HP -= 1f;
-                this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
-            }
-            else
-            {
-                Debug.Log("レーザータグが一致しません。");
-            }
+            Debug.Log($"{ghostType}: {laserTag} タグでダメージを受けました！");
+            HP -= 1f;
+            this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
+        }
+        else
+        {
+            Debug.Log("レーザータグが一致しません。");
         }
     }
 
@@ -102,43 +97,117 @@ public class Ghost_control : MonoBehaviour
         }
 
         // ゴーストが消える直前にダメージを与える
-        if (name != "whiteGhost")
+        if (ghostType != GhostType.White)
         {
-            gameManage.damage += 1;
+            yield return StartCoroutine(MoveToTargetAndDisappear());
+        }
+        else
+        {
+            StartCoroutine(Escape());
+        }
+    }
+
+    private IEnumerator Escape()
+    {
+        // 反対方向を向く
+        transform.rotation = Quaternion.LookRotation(-transform.forward);
+
+        // ゴーストが逃げる向きを決定（現在の前方方向）
+        Vector3 escapeDirection = transform.forward.normalized;
+
+        // 移動速度を設定
+        float escapeSpeed = 1f;
+
+        // 移動を1秒間続ける
+        float escapeDuration = 2f;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < escapeDuration)
+        {
+            // ゴーストを移動させる
+            transform.position += escapeDirection * escapeSpeed * Time.deltaTime;
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        OnDestroy();
+        // 移動後にゴーストを削除
+        Destroy(this.gameObject);
+    }
+
+    private IEnumerator MoveToTargetAndDisappear()
+    {
+        // `objectsToHide` から現在の `currentIndex` の位置を取得
+        if (gameManage.objectsToHide != null && gameManage.currentIndex < gameManage.objectsToHide.Length)
+        {
+            GameObject targetObject = gameManage.objectsToHide[gameManage.currentIndex];
+
+            // 対象オブジェクトが非アクティブでない場合のみ移動を実行
+            if (targetObject != null && targetObject.activeSelf)
+            {
+                Vector3 startPosition = transform.position;
+                Vector3 targetPosition = targetObject.transform.position;
+
+                float moveDuration = 3f; // 移動にかかる時間
+                float elapsedTime = 0f;
+
+                while (elapsedTime < moveDuration)
+                {
+                    // ゴーストをターゲットの位置に線形補間で移動
+                    transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / moveDuration);
+                    elapsedTime += Time.deltaTime;
+                    yield return null;
+                }
+
+                // 最後にターゲット位置を正確に設定
+                transform.position = targetPosition;
+
+                // ダメージを加算
+                gameManage.damage += 1;
+
+                // 非表示にするオブジェクトを非アクティブに
+                targetObject.SetActive(false);
+                gameManage.currentIndex++;
+            }
         }
 
-        gameObject.SetActive(false);
+        // ゴーストを削除
+        OnDestroy();
+        Destroy(this.gameObject);
     }
 
-   private void AddDefeatCount()
-{
-    switch (name)
+    private void OnDestroy()
     {
-        case "whiteGhost":
-            gameManage.whgD += 1;
-            break;
-        case "redGhost":
-            gameManage.regD += 1;
-            break;
-        case "blueGhost":
-            gameManage.blgD += 1;
-            break;
-        case "greenGhost":
-            gameManage.grgD += 1;
-            break;
-        case "cyanGhost":
-            gameManage.cygD += 1;
-            break;
-        case "magentaGhost":
-            gameManage.magD += 1;
-            break;
-        case "yellowGhost":
-            gameManage.yegD += 1;
-            break;
-        default:
-            Debug.LogWarning($"予期しないオブジェクト名: {name}");
-            break;
+        GameObject.Find("Director").GetComponent<GhostSpawn>().spawnedObjects.Remove(this.gameObject);
     }
-}
 
+    private void AddDefeatCount()
+    {
+        switch (ghostType)
+        {
+            case GhostType.White:
+                gameManage.whgD += 1;
+                break;
+            case GhostType.Red:
+                gameManage.regD += 1;
+                break;
+            case GhostType.Blue:
+                gameManage.blgD += 1;
+                break;
+            case GhostType.Green:
+                gameManage.grgD += 1;
+                break;
+            case GhostType.Cyan:
+                gameManage.cygD += 1;
+                break;
+            case GhostType.Magenta:
+                gameManage.magD += 1;
+                break;
+            case GhostType.Yellow:
+                gameManage.yegD += 1;
+                break;
+            default:
+                Debug.LogWarning($"予期しないゴーストタイプ: {ghostType}");
+                break;
+        }
+    }
 }

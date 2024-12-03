@@ -545,7 +545,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8587aad73cbed154b9a0a171f1a07d9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ghostType: 6
   HPLabel: {fileID: 6363308443530147912}
+  gameManage: {fileID: 0}
 --- !u!4 &605830160723752572 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2b7851ebcd9849e45b2c0f3188b994b8, type: 3}
