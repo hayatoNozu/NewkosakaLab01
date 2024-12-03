@@ -4,9 +4,9 @@ using TMPro;
 
 public class Ghost_control : MonoBehaviour
 {
-    private Vector3 originalScale;
-    private bool isHit = false;
-    private Coroutine shrinkCoroutine;
+    private Vector3 originalScale; // 元のスケールを保存
+    private bool isHit = false;    // 現在レーザーが当たっているかどうかを示すフラグ
+    private Coroutine shrinkCoroutine; // 実行中のコルーチンを追跡
     private float HP;
     private float maxHP;
     private int ATtime;
@@ -14,22 +14,7 @@ public class Ghost_control : MonoBehaviour
 
     private float minScale;
     private float maxScale;
-
-    // GhostColor enumの定義
-    public enum GhostColor
-    {
-        White,
-        Red,
-        Blue,
-        Green,
-        Cyan,
-        Magenta,
-        Yellow
-    }
-
-    public GhostColor ghostColor;  // ゴーストの色を管理する変数
-
-    private Renderer ghostRenderer; // ゴーストのレンダラー
+    
 
     void Start()
     {
@@ -38,59 +23,16 @@ public class Ghost_control : MonoBehaviour
         maxHP = 100;
         minScale = 0.3f;
         maxScale = 0.4f;
-
-        // 子オブジェクト「球.003」のRendererを取得
-        Transform sphereTransform = transform.Find("球.003");
-        if (sphereTransform != null)
-        {
-            ghostRenderer = sphereTransform.GetComponent<Renderer>();
-            if (ghostRenderer == null || ghostRenderer.material == null)
-            {
-                Debug.LogError("Renderer または Material が見つかりません！");
-            }
-        }
-        else
-        {
-            Debug.LogError("子オブジェクト「球.003」が見つかりません！");
-        }
-
-        StartCoroutine(Atack());
-        GameManage.AG += 1;
+        StartCoroutine(Atack()); // コルーチンを一度だけ実行
     }
 
     void Update()
     {
         HPLabel.text = "HP:" + HP;
 
-        if (HP <= 0)
-        {
-            // ghostColor に基づいて色を判定し、対応するゴーストのダメージを増やす
-            switch (ghostColor)
-            {
-                case GhostColor.White:
-                    GameManage.whgD += 1;
-                    break;
-                case GhostColor.Red:
-                    GameManage.regD += 1;
-                    break;
-                case GhostColor.Blue:
-                    GameManage.blgD += 1;
-                    break;
-                case GhostColor.Green:
-                    GameManage.grgD += 1;
-                    break;
-                case GhostColor.Cyan:
-                    GameManage.cygD += 1;
-                    break;
-                case GhostColor.Magenta:
-                    GameManage.magD += 1;
-                    break;
-                case GhostColor.Yellow:
-                    GameManage.yegD += 1;
-                    break;
-            }
 
-            GameManage.DG += 1;
+        if(HP <=  0)
+        {
             Destroy(this.gameObject);
         }
 
@@ -100,48 +42,57 @@ public class Ghost_control : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("laser"))
+        if (other.gameObject.CompareTag("laser")) 
         {
-            LineRenderer lineRenderer = other.GetComponent<LineRenderer>();
-            if (lineRenderer != null)
-            {
-                Color lineColor = lineRenderer.startColor;
+            HP -= 1f;
+            this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
+        }
 
-                // レーザーの色とゴーストの色が一致した場合
-                if (AreColorsSimilar(ghostRenderer.material.color, lineColor, 0.01f))
-                {
-                    Debug.Log("マテリアルの色とラインレンダラーの色が一致しました！");
-                    HP -= 1f;
-                    this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
-                }
-                else
-                {
-                    Debug.Log("色が一致しません。");
-                }
+
+    }
+
+
+    /*
+    private IEnumerator wait()
+    {
+        if (isHit)
+        {
+            float shrinkRate = 0.05f;
+            float minScale = 0.1f;
+
+            Debug.Log("Hitt!!!!!!!!!!!!!!!!!!");
+
+            while (isHit && transform.localScale.x > minScale)
+            {
+                Vector3 currentScale = transform.localScale;
+                transform.localScale = new Vector3(
+                    Mathf.Max(currentScale.x - shrinkRate, minScale),
+                    Mathf.Max(currentScale.y - shrinkRate, minScale),
+                    Mathf.Max(currentScale.z - shrinkRate, minScale)
+                );
+                HP -= 2;
+                yield return new WaitForSeconds(0.1f);
+                isHit = false;
+            }
+
+            // 最小スケールに達した場合、自動的に停止
+            if (HP <= 0)
+            {
+                gameObject.SetActive(false);
+                GameManager.score += 1; // スコアを1増やす
             }
         }
     }
+    */
 
     private IEnumerator Atack()
     {
         while (ATtime < 15)
         {
             ATtime += 1;
-            yield return new WaitForSeconds(1f);
-        }
-
-        if (ghostColor != GhostColor.White)
-        {
-            GameManage.damage += 1;
+            yield return new WaitForSeconds(1f); // 1秒ごとに増加
         }
 
         gameObject.SetActive(false);
-    }
-
-    private bool AreColorsSimilar(Color color1, Color color2, float tolerance)
-    {
-        return Mathf.Abs(color1.r - color2.r) < tolerance &&
-               Mathf.Abs(color1.g - color2.g) < tolerance &&
-               Mathf.Abs(color1.b - color2.b) < tolerance;
     }
 }
