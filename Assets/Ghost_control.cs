@@ -4,9 +4,9 @@ using TMPro;
 
 public class Ghost_control : MonoBehaviour
 {
-    private Vector3 originalScale; // 元のスケールを保存
-    private bool isHit = false;    // 現在レーザーが当たっているかどうかを示すフラグ
-    private Coroutine shrinkCoroutine; // 実行中のコルーチンを追跡
+    private Vector3 originalScale;
+    private bool isHit = false;
+    private Coroutine shrinkCoroutine;
     private float HP;
     private float maxHP;
     private int ATtime;
@@ -14,7 +14,12 @@ public class Ghost_control : MonoBehaviour
 
     private float minScale;
     private float maxScale;
-    
+
+    private Renderer ghostRenderer; // ゴーストのレンダラー
+    private Renderer childRenderer; // 子オブジェクトのレンダラー
+
+    // GameManage のインスタンスを参照
+    public GameManage gameManage;
 
     void Start()
     {
@@ -23,16 +28,40 @@ public class Ghost_control : MonoBehaviour
         maxHP = 100;
         minScale = 0.3f;
         maxScale = 0.4f;
-        StartCoroutine(Atack()); // コルーチンを一度だけ実行
+
+        ghostRenderer = GetComponent<Renderer>();
+        if (ghostRenderer == null || ghostRenderer.material == null)
+        {
+            Debug.LogError("Renderer または Material が見つかりません！");
+        }
+
+        // 子オブジェクト"球.003"のRendererを取得
+        Transform child = transform.Find("球.003");
+        if (child != null)
+        {
+            childRenderer = child.GetComponent<Renderer>();
+            if (childRenderer == null)
+            {
+                Debug.LogError("子オブジェクトのRendererが見つかりません！");
+            }
+        }
+        else
+        {
+            Debug.LogError("子オブジェクト '球.003' が見つかりません！");
+        }
+
+        StartCoroutine(Atack());
+        gameManage.AG += 1; // ゲームマネージャーの総ゴースト数を増加
     }
 
     void Update()
     {
         HPLabel.text = "HP:" + HP;
 
-
-        if(HP <=  0)
+        if (HP <= 0)
         {
+            AddDefeatCount();
+            gameManage.DG += 1; // ゲーム全体の倒されたゴースト数を増加
             Destroy(this.gameObject);
         }
 
@@ -42,57 +71,74 @@ public class Ghost_control : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("laser")) 
+        if (other.gameObject.CompareTag("laser") || other.gameObject.CompareTag("Rlaser") || other.gameObject.CompareTag("Blaser") || other.gameObject.CompareTag("Glaser") || other.gameObject.CompareTag("Claser") || other.gameObject.CompareTag("Mlaser") || other.gameObject.CompareTag("Ylaser"))
         {
-            HP -= 1f;
-            this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
-        }
-
-
-    }
-
-
-    /*
-    private IEnumerator wait()
-    {
-        if (isHit)
-        {
-            float shrinkRate = 0.05f;
-            float minScale = 0.1f;
-
-            Debug.Log("Hitt!!!!!!!!!!!!!!!!!!");
-
-            while (isHit && transform.localScale.x > minScale)
+            // オブジェクト名とレーザーのタグが一致する場合にダメージを受ける
+           if((name == "ghostRedPre" && other.gameObject.CompareTag("Rlaser")) ||
+            (name == "ghostBluePre" && other.gameObject.CompareTag("Blaser")) ||
+            (name == "ghostGreenPre" && other.gameObject.CompareTag("Glaser")) ||
+            (name == "ghostCianPre" && other.gameObject.CompareTag("Claser")) ||
+            (name == "ghostMagentaPre" && other.gameObject.CompareTag("Mlaser")) ||
+            (name == "ghostYellowPre" && other.gameObject.CompareTag("Ylaser")) ||
+            (name == "ghostWhitePre")) // whiteGhostはどのレーザーでもダメージを受ける
             {
-                Vector3 currentScale = transform.localScale;
-                transform.localScale = new Vector3(
-                    Mathf.Max(currentScale.x - shrinkRate, minScale),
-                    Mathf.Max(currentScale.y - shrinkRate, minScale),
-                    Mathf.Max(currentScale.z - shrinkRate, minScale)
-                );
-                HP -= 2;
-                yield return new WaitForSeconds(0.1f);
-                isHit = false;
+                Debug.Log($"{name}: {other.gameObject.tag} タグでダメージを受けました！");
+                HP -= 1f;
+                this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
             }
-
-            // 最小スケールに達した場合、自動的に停止
-            if (HP <= 0)
+            else
             {
-                gameObject.SetActive(false);
-                GameManager.score += 1; // スコアを1増やす
+                Debug.Log("レーザータグが一致しません。");
             }
         }
     }
-    */
 
     private IEnumerator Atack()
     {
         while (ATtime < 15)
         {
             ATtime += 1;
-            yield return new WaitForSeconds(1f); // 1秒ごとに増加
+            yield return new WaitForSeconds(1f);
+        }
+
+        // ゴーストが消える直前にダメージを与える
+        if (name != "whiteGhost")
+        {
+            gameManage.damage += 1;
         }
 
         gameObject.SetActive(false);
     }
+
+   private void AddDefeatCount()
+{
+    switch (name)
+    {
+        case "whiteGhost":
+            gameManage.whgD += 1;
+            break;
+        case "redGhost":
+            gameManage.regD += 1;
+            break;
+        case "blueGhost":
+            gameManage.blgD += 1;
+            break;
+        case "greenGhost":
+            gameManage.grgD += 1;
+            break;
+        case "cyanGhost":
+            gameManage.cygD += 1;
+            break;
+        case "magentaGhost":
+            gameManage.magD += 1;
+            break;
+        case "yellowGhost":
+            gameManage.yegD += 1;
+            break;
+        default:
+            Debug.LogWarning($"予期しないオブジェクト名: {name}");
+            break;
+    }
+}
+
 }
