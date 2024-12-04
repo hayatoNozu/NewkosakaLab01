@@ -8,6 +8,7 @@ public class MirrorSpown : MonoBehaviour
     public float minDistance = 2f;    // オブジェクトの最小距離
 
     private List<GameObject> spawnedObjects = new List<GameObject>(); // 現在の生成済みオブジェクトのリスト
+    private int currentSpawnIndex = 0; // 次に使用するスポーンポイントのインデックス
 
     public void SpawnObject(Color mirrorColor)
     {
@@ -17,9 +18,9 @@ public class MirrorSpown : MonoBehaviour
             return;
         }
 
-        // ランダムにスポーン位置を選ぶ
-        int randomPointIndex = Random.Range(0, spawnPoints.Length);
-        Transform chosenPoint = spawnPoints[randomPointIndex];
+        // 順番にスポーンポイントを選ぶ
+        Transform chosenPoint = spawnPoints[currentSpawnIndex];
+        currentSpawnIndex = (currentSpawnIndex + 1) % spawnPoints.Length; // インデックスを更新してループさせる
 
         Vector3 localOffset;
         Vector3 spawnPosition;

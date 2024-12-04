@@ -12,6 +12,7 @@ public class GhostSpawn : MonoBehaviour
     [SerializeField] private float minDistanceFromPlayer = 3f;     // プレイヤーとの最小距離
 
     public List<GameObject> spawnedObjects = new List<GameObject>(); // スポーン済みのオブジェクトを記録
+    public bool spawnPossible;
     private List<int> spawnSteps = new List<int> { 3, 3, 3, 1, 3, 3, 1, 3, 3, 2 }; // スポーン順
     private int spawnIndex = 0; // 現在のステップのインデックス
     private float time;
@@ -20,10 +21,16 @@ public class GhostSpawn : MonoBehaviour
     void Start()
     {
         time = 0;
+        SetRandomSpawnInterval(); // 最初のスポーン間隔を設定
+        spawnPossible = true;
     }
 
     void Update()
     {
+        if (!spawnPossible)
+        {
+            return;
+        }
         time += Time.deltaTime;
 
         if (time >= spawnInterval)
@@ -51,7 +58,9 @@ public class GhostSpawn : MonoBehaviour
                         directionToPlayer.y = 0; // 水平方向のみを見る場合、Y軸の影響を無視
                         spawnedObject.transform.rotation = Quaternion.LookRotation(directionToPlayer);
                     }
+
                     time = 0;
+                    SetRandomSpawnInterval(); // 次のスポーン間隔を設定
                     return;
                 }
             }
@@ -59,6 +68,12 @@ public class GhostSpawn : MonoBehaviour
             Debug.LogWarning("適切なスポーン位置が見つかりませんでした");
         }
     }
+
+    private void SetRandomSpawnInterval()
+    {
+        spawnInterval = Random.Range(5f, 8f); // 5秒から8秒の間でランダム
+    }
+
 
     private bool IsPositionValid(Vector3 position)
     {
@@ -92,15 +107,24 @@ public class GhostSpawn : MonoBehaviour
                 randam = (int)Random.Range(1, 4);
                 if (randam == 1)
                 {
-                    this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.red);
+                    for (int i = 0; i < 5; i++) // 最大10回位置を試行
+                    {
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.red);
+                    }
                 }
                 else if (randam == 2)
                 {
-                    this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.green);
+                    for (int i = 0; i < 5; i++) // 最大10回位置を試行
+                    {
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.green);
+                    }
                 }
                 else
                 {
-                    this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.blue);
+                    for (int i = 0; i < 5; i++) // 最大10回位置を試行
+                    {
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.blue);
+                    }
                 }
                 selectedObject = objectToSpawn[randam];
                 break;
@@ -108,18 +132,27 @@ public class GhostSpawn : MonoBehaviour
                 randam = (int)Random.Range(4, 7);
                 if (randam == 4)
                 {
-                    this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.green);
-                    this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.blue);
+                    for (int i = 0; i < 8; i++) // 最大10回位置を試行
+                    {
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.green);
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.blue);
+                    }
                 }
                 else if (randam == 5)
                 {
-                    this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.blue);
-                    this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.red);
+                    for (int i = 0; i < 8; i++) // 最大10回位置を試行
+                    {
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.blue);
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.red);
+                    }
                 }
                 else
                 {
-                    this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.red);
-                    this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.green);
+                    for (int i = 0; i < 8; i++) // 最大10回位置を試行
+                    {
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.red);
+                        this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.green);
+                    }
                 }
                 selectedObject = objectToSpawn[randam];
                 break;

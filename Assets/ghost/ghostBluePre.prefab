@@ -697,7 +697,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8587aad73cbed154b9a0a171f1a07d9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ghostType: 2
+  ghostType: 3
   HPLabel: {fileID: 119071382815266428}
   gameManage: {fileID: 0}
 --- !u!95 &6753477957002185523

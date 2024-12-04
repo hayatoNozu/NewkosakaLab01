@@ -11,13 +11,14 @@ TagManager:
   - red
   - blue
   - green
-  - white
   - Rlaser
   - Glaser
   - Blaser
   - Claser
   - Mlaser
   - Ylaser
+  - wlaser
+  - white
   layers:
   - Default
   - TransparentFX

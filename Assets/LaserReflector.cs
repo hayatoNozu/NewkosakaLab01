@@ -183,7 +183,7 @@ string GetLaserTagForColor(Color currentColor)
 {
     if (currentColor == laserColors[0]) // 白
     {
-        return "Wlaser";
+        return "wlaser";
     }
     else if (currentColor == laserColors[1]) // 青
     {

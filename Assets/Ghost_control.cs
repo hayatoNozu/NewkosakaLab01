@@ -8,8 +8,8 @@ public class Ghost_control : MonoBehaviour
     {
         White,
         Red,
-        Blue,
         Green,
+        Blue,
         Cyan,
         Magenta,
         Yellow
@@ -31,7 +31,6 @@ public class Ghost_control : MonoBehaviour
     private Renderer ghostRenderer; // ゴーストのレンダラー
     private Renderer childRenderer; // 子オブジェクトのレンダラー
 
-
     // GameManage のインスタンスを参照
     public GameManage gameManage;
 
@@ -43,10 +42,14 @@ public class Ghost_control : MonoBehaviour
         minScale = 0.3f;
         maxScale = 0.4f;
 
+        // GameManage の参照を取得
         gameManage = GameObject.Find("GameMnager").GetComponent<GameManage>();
+
+        // ゴーストの種類に応じて出現数を増加（配列を利用）
+        gameManage.IncrementSpawnCount((GameManage.GhostType)ghostType);
+
+        // 攻撃コルーチンを開始
         StartCoroutine(Atack());
-        gameManage.AG += 1; // ゲームマネージャーの総ゴースト数を増加
-        
     }
 
     void Update()
@@ -56,7 +59,6 @@ public class Ghost_control : MonoBehaviour
         if (HP <= 0)
         {
             AddDefeatCount();
-            gameManage.DG += 1; // ゲーム全体の倒されたゴースト数を増加
             Destroy(this.gameObject);
         }
 
@@ -67,7 +69,7 @@ public class Ghost_control : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         string laserTag = other.gameObject.tag;
-        if (laserTag != "laser") return;
+
         // オブジェクトの種類と対応するレーザーのタグが一致する場合にダメージを受ける
         if (laserTag == "laser" ||
             (ghostType == GhostType.Red && laserTag == "Rlaser") ||
@@ -79,7 +81,7 @@ public class Ghost_control : MonoBehaviour
             ghostType == GhostType.White) // Whiteはすべてのレーザーでダメージを受ける
         {
             Debug.Log($"{ghostType}: {laserTag} タグでダメージを受けました！");
-            HP -= 1f;
+            HP -= 3f;
             this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
         }
         else
@@ -96,7 +98,6 @@ public class Ghost_control : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
 
-        // ゴーストが消える直前にダメージを与える
         if (ghostType != GhostType.White)
         {
             yield return StartCoroutine(MoveToTargetAndDisappear());
@@ -109,68 +110,53 @@ public class Ghost_control : MonoBehaviour
 
     private IEnumerator Escape()
     {
-        // 反対方向を向く
         transform.rotation = Quaternion.LookRotation(-transform.forward);
 
-        // ゴーストが逃げる向きを決定（現在の前方方向）
         Vector3 escapeDirection = transform.forward.normalized;
-
-        // 移動速度を設定
         float escapeSpeed = 1f;
-
-        // 移動を1秒間続ける
         float escapeDuration = 2f;
         float elapsedTime = 0f;
 
         while (elapsedTime < escapeDuration)
         {
-            // ゴーストを移動させる
             transform.position += escapeDirection * escapeSpeed * Time.deltaTime;
             elapsedTime += Time.deltaTime;
             yield return null;
         }
         OnDestroy();
-        // 移動後にゴーストを削除
         Destroy(this.gameObject);
     }
 
     private IEnumerator MoveToTargetAndDisappear()
     {
-        // `objectsToHide` から現在の `currentIndex` の位置を取得
         if (gameManage.objectsToHide != null && gameManage.currentIndex < gameManage.objectsToHide.Length)
         {
             GameObject targetObject = gameManage.objectsToHide[gameManage.currentIndex];
 
-            // 対象オブジェクトが非アクティブでない場合のみ移動を実行
             if (targetObject != null && targetObject.activeSelf)
             {
                 Vector3 startPosition = transform.position;
                 Vector3 targetPosition = targetObject.transform.position;
 
-                float moveDuration = 3f; // 移動にかかる時間
+                float moveDuration = 3f;
                 float elapsedTime = 0f;
 
                 while (elapsedTime < moveDuration)
                 {
-                    // ゴーストをターゲットの位置に線形補間で移動
                     transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / moveDuration);
                     elapsedTime += Time.deltaTime;
                     yield return null;
                 }
 
-                // 最後にターゲット位置を正確に設定
                 transform.position = targetPosition;
 
-                // ダメージを加算
                 gameManage.damage += 1;
 
-                // 非表示にするオブジェクトを非アクティブに
                 targetObject.SetActive(false);
                 gameManage.currentIndex++;
             }
         }
 
-        // ゴーストを削除
         OnDestroy();
         Destroy(this.gameObject);
     }
@@ -182,32 +168,6 @@ public class Ghost_control : MonoBehaviour
 
     private void AddDefeatCount()
     {
-        switch (ghostType)
-        {
-            case GhostType.White:
-                gameManage.whgD += 1;
-                break;
-            case GhostType.Red:
-                gameManage.regD += 1;
-                break;
-            case GhostType.Blue:
-                gameManage.blgD += 1;
-                break;
-            case GhostType.Green:
-                gameManage.grgD += 1;
-                break;
-            case GhostType.Cyan:
-                gameManage.cygD += 1;
-                break;
-            case GhostType.Magenta:
-                gameManage.magD += 1;
-                break;
-            case GhostType.Yellow:
-                gameManage.yegD += 1;
-                break;
-            default:
-                Debug.LogWarning($"予期しないゴーストタイプ: {ghostType}");
-                break;
-        }
+        gameManage.IncrementDefeatCount((GameManage.GhostType)ghostType);
     }
 }

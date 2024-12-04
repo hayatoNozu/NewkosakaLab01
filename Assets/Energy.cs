@@ -83,7 +83,7 @@ public class Energy : MonoBehaviour
         {
             if (!triger)
             {
-                energy += 10;
+                energy += 15;
             }
 
             

@@ -2,23 +2,20 @@ using UnityEngine;
 
 public class GameManage : MonoBehaviour
 {
-    // 出現数
-    public int whg = 0;
-    public int reg = 0;
-    public int grg = 0;
-    public int blg = 0;
-    public int cyg = 0;
-    public int mag = 0;
-    public int yeg = 0;
+    public enum GhostType
+    {
+        White,
+        Red,
+        Green,
+        Blue,
+        Cyan,
+        Magenta,
+        Yellow
+    }
 
-    // 倒した数
-    public int whgD = 0;
-    public int regD = 0;
-    public int grgD = 0;
-    public int blgD = 0;
-    public int cygD = 0;
-    public int magD = 0;
-    public int yegD = 0;
+    // 出現数と倒した数を配列で管理
+    public int[] spawnCounts = new int[7];  // 出現数を配列で管理
+    public int[] defeatCounts = new int[7]; // 倒した数を配列で管理
 
     public float rate = 0;
     public int AG = 0; // 出現数
@@ -28,39 +25,30 @@ public class GameManage : MonoBehaviour
     public GameObject[] objectsToHide; // 非表示にするオブジェクトのリスト
     public int currentIndex = 0;      // 次に非表示にするオブジェクトのインデックス
 
-    // 出現数と倒した数を「出現数/倒した数」の形式で管理する変数
-    public string whgStats => $"{whg}/{whgD}";
-    public string regStats => $"{reg}/{regD}";
-    public string grgStats => $"{grg}/{grgD}";
-    public string blgStats => $"{blg}/{blgD}";
-    public string cygStats => $"{cyg}/{cygD}";
-    public string magStats => $"{mag}/{magD}";
-    public string yegStats => $"{yeg}/{yegD}";
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    // 出現数と倒した数を「出現数/倒した数」の形式で取得
+    public string[] GhostStats
     {
-
+        get
+        {
+            string[] stats = new string[7];
+            for (int i = 0; i < spawnCounts.Length; i++)
+            {
+                stats[i] = $"{defeatCounts[i]}/{spawnCounts[i]}";
+            }
+            return stats;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void IncrementSpawnCount(GhostType type)
     {
-        /*
-        // ダメージによるオブジェクト非表示処理
-        if (damage > currentIndex && currentIndex < objectsToHide.Length)
-        {
-            // 現在のインデックスに対応するオブジェクトを非表示にする
-            objectsToHide[currentIndex].SetActive(false);
-            currentIndex++;
-        }
+        spawnCounts[(int)type]++;
+        AG++; // 総出現数も増加
+    }
 
-        // すべてのオブジェクトが非表示になった場合のゲームオーバー判定
-        if (currentIndex >= objectsToHide.Length)
-        {
-            // ゲームオーバーの処理
-        }
-        */
+    public void IncrementDefeatCount(GhostType type)
+    {
+        defeatCounts[(int)type]++;
+        DG++; // 総倒した数も増加
     }
 
     public void GameEnd()

@@ -1,10 +1,13 @@
 using UnityEngine;
 using System.Collections;
+using TMPro;
 
 public class SequentialUI : MonoBehaviour
 {
     public GameObject[] ghostNormal; // 通常UI要素
     public GameObject[] ghostParfect; // 完璧UI要素
+    public GameObject[] ghostNokosi;
+    public GameObject[] ghostCount;
     public GameObject lastUI; // 最後に表示するUI
     public float displayInterval = 0.5f; // 表示間隔
     public float lastDisplayDelay = 1f; // 最後のUIを表示するまでの遅延
@@ -27,8 +30,23 @@ public class SequentialUI : MonoBehaviour
         {
             if (ghostParfect[i] != null)
             {
-                ghostParfect[i].SetActive(true); // 完璧UIを表示
-                ghostNormal[i]?.SetActive(false); // 通常UIを非表示
+                GameManage manage = GameObject.Find("GameMnager").GetComponent<GameManage>();
+                string count = manage.GhostStats[i];
+                ghostCount[i].GetComponent<TextMeshProUGUI>().text = count;
+
+                if(manage.spawnCounts[i] != 0 && manage.spawnCounts[i] != manage.defeatCounts[i])
+                {
+                    ghostNormal[i].SetActive(false);
+                    ghostNokosi[i].SetActive(true);
+                }
+                else if(manage.spawnCounts[i] == manage.defeatCounts[i])
+                {
+                    ghostParfect[i].SetActive(true); // 完璧UIを表示
+                    ghostNormal[i]?.SetActive(false); // 通常UIを非表示
+                }
+
+                
+
                 yield return new WaitForSeconds(displayInterval);
             }
         }
