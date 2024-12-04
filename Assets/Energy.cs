@@ -17,6 +17,8 @@ public class Energy : MonoBehaviour
     private float lastAngle = 0f; // 前回フレームのハンドル角度
     private bool triger;
 
+    public AudioSource audio;
+
     void Start()
     {
         // ハンドルの初期角度を取得
@@ -77,13 +79,13 @@ public class Energy : MonoBehaviour
         float angleDifference = Mathf.DeltaAngle(lastAngle, currentAngle);
         cumulativeAngle += Mathf.Abs(angleDifference);
 
-        Debug.Log(cumulativeAngle);
         // 累積角度が 360 度を超えた場合にエネルギーを回復
         if (Mathf.Abs(cumulativeAngle) >= 360f)
         {
-            if (!triger)
+            if (!triger && energy <100)
             {
                 energy += 15;
+                audio.Play();
             }
 
             

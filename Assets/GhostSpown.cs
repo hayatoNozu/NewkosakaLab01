@@ -13,7 +13,7 @@ public class GhostSpawn : MonoBehaviour
 
     public List<GameObject> spawnedObjects = new List<GameObject>(); // スポーン済みのオブジェクトを記録
     public bool spawnPossible;
-    private List<int> spawnSteps = new List<int> { 3, 3, 3, 1, 3, 3, 1, 3, 3, 2 }; // スポーン順
+    private List<int> spawnSteps = new List<int> { 3, 3, 1,  3, 1, 3, 2 }; // スポーン順
     private int spawnIndex = 0; // 現在のステップのインデックス
     private float time;
     private int randam;
@@ -71,7 +71,7 @@ public class GhostSpawn : MonoBehaviour
 
     private void SetRandomSpawnInterval()
     {
-        spawnInterval = Random.Range(5f, 8f); // 5秒から8秒の間でランダム
+        spawnInterval = Random.Range(3f, 5f); // 5秒から8秒の間でランダム
     }
 
 
@@ -105,6 +105,7 @@ public class GhostSpawn : MonoBehaviour
         {
             case 1: // 配列の2～4からランダムでスポーン
                 randam = (int)Random.Range(1, 4);
+                /*
                 if (randam == 1)
                 {
                     for (int i = 0; i < 5; i++) // 最大10回位置を試行
@@ -126,10 +127,12 @@ public class GhostSpawn : MonoBehaviour
                         this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.blue);
                     }
                 }
+                */
                 selectedObject = objectToSpawn[randam];
                 break;
             case 2: // 配列の5～7からランダムでスポーン
                 randam = (int)Random.Range(4, 7);
+                /*
                 if (randam == 4)
                 {
                     for (int i = 0; i < 8; i++) // 最大10回位置を試行
@@ -154,10 +157,11 @@ public class GhostSpawn : MonoBehaviour
                         this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.green);
                     }
                 }
+                */
                 selectedObject = objectToSpawn[randam];
                 break;
             case 3: // 配列の1番目をスポーン
-                this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.white);
+                //this.gameObject.GetComponent<MirrorSpown>().SpawnObject(Color.white);
                 selectedObject = objectToSpawn[0];
                 break;
             default:

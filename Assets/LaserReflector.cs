@@ -6,7 +6,7 @@ using System;
 public class LaserReflector : MonoBehaviour
 {
     public GameObject laserPrefab;
-    public int maxReflections = 5;
+    public int maxReflections;
     public float maxLaserDistance = 100f;
     public LayerMask reflectLayerMask;
     public Color[] laserColors;
@@ -18,7 +18,7 @@ public class LaserReflector : MonoBehaviour
     private SteamVR_Action_Boolean Iui = SteamVR_Actions.default_InteractUI;
     private Boolean interacrtui;
 
-    AudioSource audio;
+    public AudioSource audio;
     private bool se =true;
 
     [HideInInspector] public bool empty=false;
@@ -52,7 +52,7 @@ public class LaserReflector : MonoBehaviour
             ClearLaserSegments();
         }
     }
-
+    /*
     void GenerateLaserPath()
     {
         ClearLaserSegments();
@@ -85,6 +85,43 @@ public class LaserReflector : MonoBehaviour
             }
         }
 
+    }
+    */
+
+    void GenerateLaserPath()
+    {
+        ClearLaserSegments();
+
+        Vector3 startPosition = transform.position;
+        Vector3 direction = transform.forward;
+        currentReflections = 0; // 反射回数をリセット
+        Color currentColor = laserColors[0];
+
+        while (currentReflections < maxReflections)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(startPosition, direction, out hit, maxLaserDistance, reflectLayerMask))
+            {
+                List<Vector3> positions = new List<Vector3> { startPosition, hit.point };
+                CreateLaserSegment(startPosition, hit.point, currentReflections, currentColor, positions);
+
+                currentColor = ChooseColorBasedOnCollider(hit.collider, currentColor);
+
+                // 反射方向を計算し、上下成分を削除
+                direction = Vector3.Reflect(direction, hit.normal);
+                direction.y = 0; // 上下反射角をゼロに
+                direction = direction.normalized; // 正規化して方向を保つ
+
+                startPosition = hit.point;
+                currentReflections++; // 反射回数を増加
+            }
+            else
+            {
+                List<Vector3> positions = new List<Vector3> { startPosition, startPosition + direction * maxLaserDistance };
+                CreateLaserSegment(startPosition, startPosition + direction * maxLaserDistance, currentReflections, currentColor, positions);
+                break;
+            }
+        }
     }
 
     void PlayMusic()

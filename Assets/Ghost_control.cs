@@ -30,7 +30,7 @@ public class Ghost_control : MonoBehaviour
 
     private Renderer ghostRenderer; // ゴーストのレンダラー
     private Renderer childRenderer; // 子オブジェクトのレンダラー
-
+    private bool isDefeated = false; // やられた状態を管理するフラグ
     // GameManage のインスタンスを参照
     public GameManage gameManage;
 
@@ -56,15 +56,36 @@ public class Ghost_control : MonoBehaviour
     {
         HPLabel.text = "HP:" + HP;
 
-        if (HP <= 0)
+        if (HP <= 0 && !isDefeated)
         {
-            AddDefeatCount();
-            Destroy(this.gameObject);
+            isDefeated = true; // やられた状態に設定
+            StartCoroutine(HandleDefeat());
         }
 
         float newScale = Mathf.Lerp(minScale, maxScale, HP / maxHP);
         transform.localScale = new Vector3(newScale, newScale, newScale);
     }
+
+    private IEnumerator HandleDefeat()
+    {
+        // アニメーション再生
+        Animator animator = this.gameObject.GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.SetTrigger("Defeated");
+        }
+
+        // アニメーションの終了を待機
+        yield return new WaitForSeconds(1.4f);
+
+        // 倒されたカウントを増加
+        AddDefeatCount();
+
+        // ゴーストを削除
+        OnDestroy();
+        Destroy(this.gameObject);
+    }
+
 
     private void OnTriggerEnter(Collider other)
     {
