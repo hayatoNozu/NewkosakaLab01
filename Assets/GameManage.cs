@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManage : MonoBehaviour
 {
@@ -27,6 +28,13 @@ public class GameManage : MonoBehaviour
     public int currentIndex = 0;      // 次に非表示にするオブジェクトのインデックス
     public GameObject candleUI;
     public TextMeshProUGUI candleText;
+    public TextMeshProUGUI gameoverText;
+    public GameObject GameOberHUD;
+    public string yarareText;
+    public Image ghostColor;
+
+    public Sprite[] color;
+    public int colorNumber;
 
     // 出現数と倒した数を「出現数/倒した数」の形式で取得
     public string[] GhostStats
@@ -88,13 +96,35 @@ public class GameManage : MonoBehaviour
         // 評価の表示（もしくはその他の処理）
         Debug.Log("評価: " + grade + " (" + rate.ToString("F2") + "%)");
     }
-
+    
     public void CandleUI()
     {
+        int remainingObjects = objectsToHide.Length - currentIndex;
+        if (remainingObjects == 0)
+        {
+            //GameOver処理
+            GameOberHUD.SetActive(true);
+            gameoverText.text = yarareText;
+            ghostColor.sprite = color[colorNumber];
+            GameObject.Find("Director").GetComponent<GhostSpawn>().spawnPossible = false;
+            DestroyGhost();
+            return;
+        }
         candleUI.SetActive(true);
         candleUI.GetComponent<BlinkAndDisappear>().StartCor();       
         // 残りオブジェクト数を計算
-        int remainingObjects = objectsToHide.Length - currentIndex;
+        
         candleText.text = $"残り{remainingObjects}本";
+    }
+
+    public void DestroyGhost()
+    {
+        GameObject[] ghosts = GameObject.FindGameObjectsWithTag("ghost");
+
+        // 各オブジェクトを削除
+        foreach (GameObject ghost in ghosts)
+        {
+            Destroy(ghost);
+        }
     }
 }

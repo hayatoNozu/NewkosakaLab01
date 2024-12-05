@@ -646,6 +646,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ghostCianPre
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2b7851ebcd9849e45b2c0f3188b994b8, type: 3}
+      propertyPath: m_TagString
+      value: ghost
+      objectReference: {fileID: 0}
     - target: {fileID: 3807195052837979625, guid: 2b7851ebcd9849e45b2c0f3188b994b8, type: 3}
       propertyPath: 'm_Materials.Array.data[2]'
       value: 

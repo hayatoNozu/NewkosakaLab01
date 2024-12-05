@@ -10,6 +10,7 @@ public class SequentialUI : MonoBehaviour
     public GameObject[] ghostNokosi;
     public GameObject[] ghostCount;
     public GameObject lastUI;
+    public GameObject seaneMirror;
     public float displayInterval = 0.5f;
     public float lastDisplayDelay = 1f;
 
@@ -64,6 +65,11 @@ public class SequentialUI : MonoBehaviour
             GameEnd();
             lastUI.SetActive(true);
         }
+
+        yield return new WaitForSeconds(10f);
+
+        seaneMirror.SetActive(true);
+        gameObject.SetActive(false);
     }
 
     float rate = 0;

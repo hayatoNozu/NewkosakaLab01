@@ -39,6 +39,8 @@ public class Ghost_control : MonoBehaviour
     private AudioSource thisAudio;
     public AudioClip death;
 
+
+
     private bool hit;
     void Start()
     {
@@ -192,6 +194,9 @@ public class Ghost_control : MonoBehaviour
             {
                 Animator animator = this.gameObject.GetComponent<Animator>();
                 animator.SetTrigger("runaway");
+
+               gameManage.GetComponent<BGMManager>().CrossfadeToBGM2();
+
                 Vector3 startPosition = transform.position;
                 Vector3 targetPosition = targetObject.transform.position;
 
@@ -242,7 +247,39 @@ public class Ghost_control : MonoBehaviour
                     gameManage.damage += 1;
                     targetObject.SetActive(false);
                     gameManage.currentIndex++;
+                    gameManage.GetComponent<BGMManager>().CrossfadeToBGM1();
+                    if(ghostType == GhostType.Blue)
+                    {
+                        gameManage.yarareText = "青色のお化けにやられた";
+                        gameManage.colorNumber = 2;
+                    }
+                    else if (ghostType == GhostType.Red)
+                    {
+                        gameManage.yarareText = "赤色のお化けにやられた";
+                        gameManage.colorNumber = 0;
+                    }
+                    else if (ghostType == GhostType.Green)
+                    {
+                        gameManage.yarareText = "緑色のお化けにやられた";
+                        gameManage.colorNumber = 1;
+                    }
+                    else if (ghostType == GhostType.Cyan)
+                    {
+                        gameManage.yarareText = "水色のお化けにやられた";
+                        gameManage.colorNumber = 3;
+                    }
+                    else if (ghostType == GhostType.Yellow)
+                    {
+                        gameManage.yarareText = "黄色のお化けにやられた";
+                        gameManage.colorNumber = 5;
+                    }
+                    else if (ghostType == GhostType.Magenta)
+                    {
+                        gameManage.yarareText = "紫色のお化けにやられた";
+                        gameManage.colorNumber = 4;
+                    }
                     gameManage.CandleUI();
+
                     Destroy(this.gameObject);
                 }
             }

@@ -6,6 +6,7 @@ public class DelayGameOverPanelCloseScript : MonoBehaviour
 {
     public float delayTime; //’x‰„ŽžŠÔ
     public GameObject GameOverHUD; //GameOverƒpƒlƒ‹
+    public GameObject SeaneMirro;
 
 
     void Start()
@@ -18,5 +19,6 @@ public class DelayGameOverPanelCloseScript : MonoBehaviour
     {
         yield return new WaitForSeconds(delayTime);
         GameOverHUD.SetActive(false);
+        SeaneMirro.SetActive(true);
     }
 }
