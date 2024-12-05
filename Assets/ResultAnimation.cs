@@ -84,11 +84,11 @@ public class SequentialUI : MonoBehaviour
         {
             gradeImage.sprite = gradeC;
         }
-        else if (rate < 75)
+        else if (rate < 70)
         {
             gradeImage.sprite = gradeB;
         }
-        else if (rate < 90)
+        else if (rate < 85)
         {
             gradeImage.sprite = gradeA;
         }

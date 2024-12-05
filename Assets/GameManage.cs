@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class GameManage : MonoBehaviour
@@ -24,6 +25,8 @@ public class GameManage : MonoBehaviour
 
     public GameObject[] objectsToHide; // 非表示にするオブジェクトのリスト
     public int currentIndex = 0;      // 次に非表示にするオブジェクトのインデックス
+    public GameObject candleUI;
+    public TextMeshProUGUI candleText;
 
     // 出現数と倒した数を「出現数/倒した数」の形式で取得
     public string[] GhostStats
@@ -84,5 +87,14 @@ public class GameManage : MonoBehaviour
 
         // 評価の表示（もしくはその他の処理）
         Debug.Log("評価: " + grade + " (" + rate.ToString("F2") + "%)");
+    }
+
+    public void CandleUI()
+    {
+        candleUI.SetActive(true);
+        candleUI.GetComponent<BlinkAndDisappear>().StartCor();       
+        // 残りオブジェクト数を計算
+        int remainingObjects = objectsToHide.Length - currentIndex;
+        candleText.text = $"残り{remainingObjects}本";
     }
 }

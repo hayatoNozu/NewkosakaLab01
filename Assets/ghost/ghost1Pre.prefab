@@ -326,8 +326,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 81f749cc11102f8449701c909b538c50, type: 2}
-  m_sharedMaterial: {fileID: -6207363910490643511, guid: 81f749cc11102f8449701c909b538c50, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 64b552c052054734a8b17e5094186f5c, type: 2}
+  m_sharedMaterial: {fileID: -1197784001817226711, guid: 64b552c052054734a8b17e5094186f5c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -898,8 +898,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 183bd3a40c635704d8475595d8a99e38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeRemaining: 10
+  timeRemaining: 15
   timerText: {fileID: 7786190205491136294}
+  timer: {fileID: 6832748799177417394}
 --- !u!82 &8937695779006345900
 AudioSource:
   m_ObjectHideFlags: 0

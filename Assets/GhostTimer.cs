@@ -5,6 +5,7 @@ public class GhostTimer : MonoBehaviour
 {
     public float timeRemaining = 10f; // 初期タイマー時間
     public TextMeshProUGUI timerText;
+    public GameObject timer;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -16,6 +17,11 @@ public class GhostTimer : MonoBehaviour
     {
         timeRemaining -= Time.deltaTime;
         timerText.text = timeRemaining.ToString("0");
+        if(timeRemaining < 0)
+        {
+            Destroy(timer);
+        }
+        
 
     }
 }

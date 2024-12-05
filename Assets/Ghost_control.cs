@@ -33,6 +33,9 @@ public class Ghost_control : MonoBehaviour
     private bool isDefeated = false; // やられた状態を管理するフラグ
     // GameManage のインスタンスを参照
     public GameManage gameManage;
+    public GameObject timer;
+
+
 
     void Start()
     {
@@ -54,10 +57,11 @@ public class Ghost_control : MonoBehaviour
 
     void Update()
     {
-        HPLabel.text = "HP:" + HP;
+        //HPLabel.text = "HP:" + HP;
 
         if (HP <= 0 && !isDefeated)
         {
+
             isDefeated = true; // やられた状態に設定
             StartCoroutine(HandleDefeat());
         }
@@ -156,30 +160,63 @@ public class Ghost_control : MonoBehaviour
 
             if (targetObject != null && targetObject.activeSelf)
             {
+                Animator animator = this.gameObject.GetComponent<Animator>();
+                animator.SetTrigger("runaway");
                 Vector3 startPosition = transform.position;
                 Vector3 targetPosition = targetObject.transform.position;
 
-                float moveDuration = 3f;
+                // 固定するY軸の値を保存
+                float fixedY = startPosition.y;
+
+                // ターゲット手前で止まるためのオフセット距離
+                float stopDistance = 1.0f;
+
+                float moveDuration = 2f;
                 float elapsedTime = 0f;
 
+                // ターゲット手前の位置を計算
+                Vector3 directionToTarget = (targetPosition - startPosition).normalized;
+                Vector3 stopPosition = targetPosition - directionToTarget * stopDistance;
+
+                // ターゲット手前に移動
                 while (elapsedTime < moveDuration)
                 {
-                    transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / moveDuration);
+                    Vector3 newPosition = Vector3.Lerp(startPosition, stopPosition, elapsedTime / moveDuration);
+
+                    // Y軸を固定
+                    newPosition.y = fixedY;
+
+                    transform.position = newPosition;
                     elapsedTime += Time.deltaTime;
+
+                    // 移動を途中で終了する条件
+                    if (Vector3.Distance(transform.position, stopPosition) < 0.1f)
+                    {
+                        break;
+                    }
+
                     yield return null;
                 }
 
-                transform.position = targetPosition;
+                // 最終位置もY軸を固定
+                transform.position = new Vector3(stopPosition.x, fixedY, stopPosition.z);
 
-                gameManage.damage += 1;
+                // 攻撃アニメーションの再生
+                if (animator != null)
+                {
+                    animator.SetTrigger("attack");
+                    // アニメーションの終了を待機
+                    yield return new WaitForSeconds(2f);
 
-                targetObject.SetActive(false);
-                gameManage.currentIndex++;
+                    // ダメージ加算とターゲットオブジェクトの非アクティブ化
+                    gameManage.damage += 1;
+                    targetObject.SetActive(false);
+                    gameManage.currentIndex++;
+                    gameManage.CandleUI();
+                    Destroy(this.gameObject);
+                }
             }
         }
-
-        OnDestroy();
-        Destroy(this.gameObject);
     }
 
     private void OnDestroy()
