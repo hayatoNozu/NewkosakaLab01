@@ -11,6 +11,8 @@ public class TimedObjectSpawner : MonoBehaviour
     public AudioSource bgm;
     public AudioSource resultBgm;
 
+    private bool hasPlayedResultBgm = false; // resultBgmの再生フラグ
+
     void Update()
     {
         timer += Time.deltaTime;
@@ -20,11 +22,15 @@ public class TimedObjectSpawner : MonoBehaviour
             // スポーンを停止
             this.gameObject.GetComponent<GhostSpawn>().spawnPossible = false;
         }
-        if (timer >= spawnDelay)
+
+        if (timer >= spawnDelay && !hasPlayedResultBgm)
         {
+            // resultBgmを一度だけ再生する
             bgm.Stop();
             resultBgm.Play();
             objectToSpawn.SetActive(true);
+
+            hasPlayedResultBgm = true; // 再生済みフラグを設定
         }
     }
 }

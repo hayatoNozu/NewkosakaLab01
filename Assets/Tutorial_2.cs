@@ -1,4 +1,5 @@
 using UnityEngine;
+using Valve.VR;
 
 public class Tutorial_2 : MonoBehaviour
 {
@@ -7,7 +8,9 @@ public class Tutorial_2 : MonoBehaviour
     public GameObject target3;  // 表示したいターゲット3
 
     private bool target2Shown = false; // ターゲット2表示済みフラグ
-    private bool target2HiddenAgain = false; // ターゲット2が再度非表示になったか確認
+
+    private SteamVR_Action_Boolean triggerAction = SteamVR_Actions.default_InteractUI; // トリガー入力
+    private SteamVR_Input_Sources hand = SteamVR_Input_Sources.RightHand; // トリガーの入力ソース
 
     void Start()
     {
@@ -34,14 +37,14 @@ public class Tutorial_2 : MonoBehaviour
             target2Shown = true; // フラグを更新
         }
 
-        // ターゲット2が非表示に戻った場合、ターゲット3を表示
-        if (target2 != null && !target2.activeSelf && target2Shown && !target2HiddenAgain)
+        // トリガーを引いたらターゲット2を非表示にし、ターゲット3を表示
+        if (target2 != null && target2.activeSelf && triggerAction.GetStateDown(hand))
         {
+            target2.SetActive(false); // ターゲット2を非表示
             if (target3 != null)
             {
                 target3.SetActive(true); // ターゲット3を表示
             }
-            target2HiddenAgain = true; // フラグを更新
         }
     }
 }
