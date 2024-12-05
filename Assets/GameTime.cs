@@ -8,6 +8,9 @@ public class TimedObjectSpawner : MonoBehaviour
 
     private float timer = 0f; // 経過時間を計測するタイマー
 
+    public AudioSource bgm;
+    public AudioSource resultBgm;
+
     void Update()
     {
         timer += Time.deltaTime;
@@ -19,6 +22,8 @@ public class TimedObjectSpawner : MonoBehaviour
         }
         if (timer >= spawnDelay)
         {
+            //bgm.Stop();
+            resultBgm.Play();
             objectToSpawn.SetActive(true);
         }
     }

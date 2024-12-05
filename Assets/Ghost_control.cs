@@ -34,11 +34,15 @@ public class Ghost_control : MonoBehaviour
     // GameManage のインスタンスを参照
     public GameManage gameManage;
     public GameObject timer;
+    public GameObject deathParticlePrefab; // パーティクルのプレハブ
 
+    private AudioSource thisAudio;
+    public AudioClip death;
 
-
+    private bool hit;
     void Start()
     {
+        thisAudio = GetComponent<AudioSource>();
         HP = 100;
         ATtime = 0;
         maxHP = 100;
@@ -57,18 +61,20 @@ public class Ghost_control : MonoBehaviour
 
     void Update()
     {
-        //HPLabel.text = "HP:" + HP;
-
+        // HPが0以下の場合、死亡処理
         if (HP <= 0 && !isDefeated)
         {
-
+            this.thisAudio.PlayOneShot(death);
+            SpawnDeathParticle();
             isDefeated = true; // やられた状態に設定
             StartCoroutine(HandleDefeat());
         }
-
+        // ゴーストのスケールをHPに基づいて変更
         float newScale = Mathf.Lerp(minScale, maxScale, HP / maxHP);
         transform.localScale = new Vector3(newScale, newScale, newScale);
     }
+
+    
 
     private IEnumerator HandleDefeat()
     {
@@ -84,36 +90,60 @@ public class Ghost_control : MonoBehaviour
 
         // 倒されたカウントを増加
         AddDefeatCount();
-
+        
         // ゴーストを削除
         OnDestroy();
         Destroy(this.gameObject);
     }
 
+    private void SpawnDeathParticle()
+    {
+        if (deathParticlePrefab != null)
+        {
+            // パーティクルをゴーストの位置に生成し、上を向くように設定
+            GameObject particle = Instantiate(deathParticlePrefab, transform.position, Quaternion.LookRotation(Vector3.up));
+
+            // 一定時間後に削除
+            Destroy(particle, 1.5f); // パーティクルの寿命を調整
+        }
+    }
+
 
     private void OnTriggerEnter(Collider other)
-    {
+    {      
         string laserTag = other.gameObject.tag;
 
-        // オブジェクトの種類と対応するレーザーのタグが一致する場合にダメージを受ける
-        if (laserTag == "laser" ||
-            (ghostType == GhostType.Red && laserTag == "Rlaser") ||
-            (ghostType == GhostType.Blue && laserTag == "Blaser") ||
-            (ghostType == GhostType.Green && laserTag == "Glaser") ||
-            (ghostType == GhostType.Cyan && laserTag == "Claser") ||
-            (ghostType == GhostType.Magenta && laserTag == "Mlaser") ||
-            (ghostType == GhostType.Yellow && laserTag == "Ylaser") ||
-            ghostType == GhostType.White) // Whiteはすべてのレーザーでダメージを受ける
+        // レーザーが当たったとき
+        if (IsLaserTagValid(laserTag))
         {
             Debug.Log($"{ghostType}: {laserTag} タグでダメージを受けました！");
             HP -= 3f;
+
+            // アニメーション再生
             this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
+
+            //laserHitSound.Play();
+            
         }
         else
         {
             Debug.Log("レーザータグが一致しません。");
         }
     }
+
+
+    private bool IsLaserTagValid(string laserTag)
+    {
+        return laserTag == "laser" ||
+               (ghostType == GhostType.Red && laserTag == "Rlaser") ||
+               (ghostType == GhostType.Blue && laserTag == "Blaser") ||
+               (ghostType == GhostType.Green && laserTag == "Glaser") ||
+               (ghostType == GhostType.Cyan && laserTag == "Claser") ||
+               (ghostType == GhostType.Magenta && laserTag == "Mlaser") ||
+               (ghostType == GhostType.Yellow && laserTag == "Ylaser") ||
+               ghostType == GhostType.White;
+    }
+
 
     private IEnumerator Atack()
     {
