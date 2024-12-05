@@ -1404,11 +1404,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!82 &267782023 stripped
-AudioSource:
-  m_CorrespondingSourceObject: {fileID: 7087962771712223592, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-  m_PrefabInstance: {fileID: 294243507}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &273015614
 GameObject:
   m_ObjectHideFlags: 0
@@ -1531,41 +1526,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2363448956875049992, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: audio
-      value: 
-      objectReference: {fileID: 267782023}
-    - target: {fileID: 2363448956875049992, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: maxReflections
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2769367517965578971, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.014
-      objectReference: {fileID: 0}
-    - target: {fileID: 2769367517965578971, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.014
-      objectReference: {fileID: 0}
-    - target: {fileID: 2769367517965578971, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.014
-      objectReference: {fileID: 0}
-    - target: {fileID: 2769367517965578971, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2769367517965578971, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -0.059
-      objectReference: {fileID: 0}
     - target: {fileID: 2918977552711085725, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 2918977552711085725, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3755409707513867302, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1606,10 +1573,6 @@ PrefabInstance:
     - target: {fileID: 3755409707513867302, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 83.257
-      objectReference: {fileID: 0}
-    - target: {fileID: 4563894199217993372, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: m_TagString
-      value: laser
       objectReference: {fileID: 0}
     - target: {fileID: 5325312055676131671, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1654,14 +1617,6 @@ PrefabInstance:
     - target: {fileID: 7304953853425226216, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
       propertyPath: useHoverSphere
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7304953853425226216, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: useFingerJointHover
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7304953853425226216, guid: 65d74bba377bc5746b4946c68c378442, type: 3}
-      propertyPath: useControllerHoverComponent
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
