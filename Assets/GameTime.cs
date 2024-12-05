@@ -22,7 +22,7 @@ public class TimedObjectSpawner : MonoBehaviour
         }
         if (timer >= spawnDelay)
         {
-            //bgm.Stop();
+            bgm.Stop();
             resultBgm.Play();
             objectToSpawn.SetActive(true);
         }
