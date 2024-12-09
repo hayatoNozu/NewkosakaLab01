@@ -20,7 +20,7 @@ public class Ghost_control : MonoBehaviour
     private Vector3 originalScale;
     private bool isHit = false;
     private Coroutine shrinkCoroutine;
-    private float HP;
+    public float HP;
     private float maxHP;
     private int ATtime;
     public TextMeshProUGUI HPLabel;

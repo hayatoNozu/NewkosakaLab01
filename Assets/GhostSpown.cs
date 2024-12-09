@@ -71,7 +71,7 @@ public class GhostSpawn : MonoBehaviour
 
     private void SetRandomSpawnInterval()
     {
-        spawnInterval = Random.Range(3f, 5f); // 5•b‚©‚ç8•b‚ÌŠÔ‚Åƒ‰ƒ“ƒ_ƒ€
+        spawnInterval = Random.Range(4f, 6f); // 5•b‚©‚ç8•b‚ÌŠÔ‚Åƒ‰ƒ“ƒ_ƒ€
     }
 
 

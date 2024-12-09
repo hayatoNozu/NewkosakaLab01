@@ -64,7 +64,7 @@ public class Energy : MonoBehaviour
         interactUI = Iui.GetState(SteamVR_Input_Sources.RightHand);
         if (interactUI)
         {
-            energy -= 0.1f;
+            energy -= 0.15f;
             triger = true;
         }
         else

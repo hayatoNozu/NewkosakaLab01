@@ -36,6 +36,9 @@ public class GameManage : MonoBehaviour
     public Sprite[] color;
     public int colorNumber;
 
+    public AudioSource bgm;
+    public AudioSource GameOverBgm;
+
     // 出現数と倒した数を「出現数/倒した数」の形式で取得
     public string[] GhostStats
     {
@@ -108,6 +111,8 @@ public class GameManage : MonoBehaviour
             ghostColor.sprite = color[colorNumber];
             GameObject.Find("Director").GetComponent<GhostSpawn>().spawnPossible = false;
             DestroyGhost();
+            bgm.Stop();
+            GameOverBgm.Play();
             return;
         }
         candleUI.SetActive(true);
@@ -124,7 +129,7 @@ public class GameManage : MonoBehaviour
         // 各オブジェクトを削除
         foreach (GameObject ghost in ghosts)
         {
-            Destroy(ghost);
+            ghost.GetComponent<Ghost_control>().HP =0;
         }
     }
 }
