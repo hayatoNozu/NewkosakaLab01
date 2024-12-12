@@ -17,9 +17,8 @@ public class Ghost_control : MonoBehaviour
 
     public GhostType ghostType; // ゴーストの種類をインスペクターで設定可能にする
 
-    private Vector3 originalScale;
-    private bool isHit = false;
-    private Coroutine shrinkCoroutine;
+
+    
     public float HP;
     private float maxHP;
     private int ATtime;
@@ -27,9 +26,6 @@ public class Ghost_control : MonoBehaviour
 
     private float minScale;
     private float maxScale;
-
-    private Renderer ghostRenderer; // ゴーストのレンダラー
-    private Renderer childRenderer; // 子オブジェクトのレンダラー
     private bool isDefeated = false; // やられた状態を管理するフラグ
     // GameManage のインスタンスを参照
     public GameManage gameManage;
@@ -38,6 +34,7 @@ public class Ghost_control : MonoBehaviour
 
     private AudioSource thisAudio;
     public AudioClip death;
+
 
 
 
@@ -52,7 +49,7 @@ public class Ghost_control : MonoBehaviour
         maxScale = 0.4f;
 
         // GameManage の参照を取得
-        gameManage = GameObject.Find("GameMnager").GetComponent<GameManage>();
+        gameManage = GameObject.Find("GameMnager").GetComponent<GameManage>();    
 
         // ゴーストの種類に応じて出現数を増加（配列を利用）
         gameManage.IncrementSpawnCount((GameManage.GhostType)ghostType);
@@ -74,6 +71,7 @@ public class Ghost_control : MonoBehaviour
         // ゴーストのスケールをHPに基づいて変更
         float newScale = Mathf.Lerp(minScale, maxScale, HP / maxHP);
         transform.localScale = new Vector3(newScale, newScale, newScale);
+
     }
 
     
@@ -111,20 +109,19 @@ public class Ghost_control : MonoBehaviour
     }
 
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {      
         string laserTag = other.gameObject.tag;
-
+        
         // レーザーが当たったとき
         if (IsLaserTagValid(laserTag))
         {
-            Debug.Log($"{ghostType}: {laserTag} タグでダメージを受けました！");
+            
             HP -= 3f;
-
             // アニメーション再生
             this.gameObject.GetComponent<Animator>().SetTrigger("Hit");
 
-            //laserHitSound.Play();
+            
             
         }
         else
@@ -132,6 +129,7 @@ public class Ghost_control : MonoBehaviour
             Debug.Log("レーザータグが一致しません。");
         }
     }
+
 
 
     private bool IsLaserTagValid(string laserTag)

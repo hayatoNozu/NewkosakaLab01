@@ -138,116 +138,116 @@ public class LaserReflector : MonoBehaviour
     }
 
     void CreateLaserSegment(Vector3 start, Vector3 end, int reflectionIndex, Color currentColor, List<Vector3> posList)
-{
-    GameObject laser = Instantiate(laserPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-    laser.tag = "laser";  // 最初に"laser"タグを設定
-    laser.layer = LayerMask.NameToLayer("laserLayer");
-
-    LineRenderer line = laser.GetComponent<LineRenderer>();
-    line.positionCount = posList.Count;
-
-    for (int iLoop = 0; iLoop < posList.Count; iLoop++)
     {
-        line.SetPosition(iLoop, posList[iLoop]);
-    }
+        GameObject laser = Instantiate(laserPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        laser.tag = "laser";  // 最初に"laser"タグを設定
+        laser.layer = LayerMask.NameToLayer("laserLayer");
 
-    BoxCollider boxCollider = laser.AddComponent<BoxCollider>();
-    boxCollider.isTrigger = true;
+        LineRenderer line = laser.GetComponent<LineRenderer>();
+        line.positionCount = posList.Count;
 
-    Vector3 direction = end - start;
-    float length = direction.magnitude;
-
-    laser.transform.position = start;
-    laser.transform.LookAt(end);
-
-    boxCollider.center = new Vector3(0, 0, length / 2.0f);
-    boxCollider.size = new Vector3(0.1f, 0.1f, length);
-
-    line.startColor = currentColor;
-    line.endColor = currentColor;
-    line.SetPosition(0, start);
-    line.SetPosition(1, end);
-
-    // ここでレーザーのタグを色に基づいて変更
-    laser.tag = GetLaserTagForColor(currentColor);
-
-    laserSegments.Add(laser);
-}
-
-Color ChooseColorBasedOnCollider(Collider collider, Color currentColor)
-{
-    if (collider.CompareTag("blue"))
-    {
-        if (currentColor == laserColors[2])
+        for (int iLoop = 0; iLoop < posList.Count; iLoop++)
         {
-            return laserColors[4];  // シアン
+            line.SetPosition(iLoop, posList[iLoop]);
         }
-        else if (currentColor == laserColors[3])
-        {
-            return laserColors[5];  // マゼンタ
-        }
-        return laserColors[1]; // 青
-    }
-    else if (collider.CompareTag("green"))
-    {
-        if (currentColor == laserColors[1])
-        {
-            return laserColors[4];  // シアン
-        }
-        else if (currentColor == laserColors[3])
-        {
-            return laserColors[6];  // イエロー
-        }
-        return laserColors[2]; // 緑
-    }
-    else if (collider.CompareTag("red"))
-    {
-        if (currentColor == laserColors[2])
-        {
-            return laserColors[6];  // イエロー
-        }
-        else if (currentColor == laserColors[1])
-        {
-            return laserColors[5];  // マゼンタ
-        }
-        return laserColors[3]; // 赤
-    }
-    return currentColor;
-}
 
-// 色に基づいてタグを決定
-string GetLaserTagForColor(Color currentColor)
-{
-    if (currentColor == laserColors[0]) // 白
-    {
-        return "wlaser";
+        BoxCollider boxCollider = laser.AddComponent<BoxCollider>();
+        boxCollider.isTrigger = true;
+
+        Vector3 direction = end - start;
+        float length = direction.magnitude;
+
+        laser.transform.position = start;
+        laser.transform.LookAt(end);
+
+        boxCollider.center = new Vector3(0, 0, length / 2.0f);
+        boxCollider.size = new Vector3(0.1f, 0.1f, length);
+
+        line.startColor = currentColor;
+        line.endColor = currentColor;
+        line.SetPosition(0, start);
+        line.SetPosition(1, end);
+
+        // ここでレーザーのタグを色に基づいて変更
+        laser.tag = GetLaserTagForColor(currentColor);
+
+        laserSegments.Add(laser);
     }
-    else if (currentColor == laserColors[1]) // 青
+
+    Color ChooseColorBasedOnCollider(Collider collider, Color currentColor)
     {
-        return "Blaser";
+        if (collider.CompareTag("blue"))
+        {
+            if (currentColor == laserColors[2])
+            {
+                return laserColors[4];  // シアン
+            }
+            else if (currentColor == laserColors[3])
+            {
+                return laserColors[5];  // マゼンタ
+            }
+            return laserColors[1]; // 青
+        }
+        else if (collider.CompareTag("green"))
+        {
+            if (currentColor == laserColors[1])
+            {
+                return laserColors[4];  // シアン
+            }
+            else if (currentColor == laserColors[3])
+            {
+                return laserColors[6];  // イエロー
+            }
+            return laserColors[2]; // 緑
+        }
+        else if (collider.CompareTag("red"))
+        {
+            if (currentColor == laserColors[2])
+            {
+                return laserColors[6];  // イエロー
+            }
+            else if (currentColor == laserColors[1])
+            {
+                return laserColors[5];  // マゼンタ
+            }
+            return laserColors[3]; // 赤
+        }
+        return currentColor;
     }
-    else if (currentColor == laserColors[2]) // 緑
+
+    // 色に基づいてタグを決定
+    string GetLaserTagForColor(Color currentColor)
     {
-        return "Glaser";
+        if (currentColor == laserColors[0]) // 白
+        {
+            return "wlaser";
+        }
+        else if (currentColor == laserColors[1]) // 青
+        {
+            return "Blaser";
+        }
+        else if (currentColor == laserColors[2]) // 緑
+        {
+            return "Glaser";
+        }
+        else if (currentColor == laserColors[3]) // 赤
+        {
+            return "Rlaser";
+        }
+        else if (currentColor == laserColors[4]) // シアン
+        {
+            return "Claser";
+        }
+        else if (currentColor == laserColors[5]) // マゼンタ
+        {
+            return "Mlaser";
+        }
+        else if (currentColor == laserColors[6]) // イエロー
+        {
+            return "Ylaser";
+        }
+        return "laser"; // デフォルトタグ
     }
-    else if (currentColor == laserColors[3]) // 赤
-    {
-        return "Rlaser";
-    }
-    else if (currentColor == laserColors[4]) // シアン
-    {
-        return "Claser";
-    }
-    else if (currentColor == laserColors[5]) // マゼンタ
-    {
-        return "Mlaser";
-    }
-    else if (currentColor == laserColors[6]) // イエロー
-    {
-        return "Ylaser";
-    }
-    return "laser"; // デフォルトタグ
-}
 
 
     void ClearLaserSegments()
